@@ -38,8 +38,12 @@ function S3Service($q) {
   function uploadFile(file) {
     const deferred = $q.defer();
     bucket.upload(file)
-      .on('httpUploadProgress',evt => deferred.notify(evt.loaded))
-      .send((err, data) => err? deferred.reject(err): deferred.resolve(data));
+      .on('httpUploadProgress', evt => deferred.notify(getPercent(evt)))
+      .send((err, data) => err ? deferred.reject(err) : deferred.resolve(data));
     return deferred.promise;
+  }
+
+  function getPercent(evt) {
+    return parseInt((evt.loaded * 100) / evt.total);
   }
 }

@@ -25,6 +25,7 @@ watch('./src/js/**/*.js')
     es5Code.to(destinyFile);
   });
 
+mkdir('./build');
 ''.to('./build/site.js'); //empty the file everytime the build is run
 
 watch('./temp/**/*.js')
