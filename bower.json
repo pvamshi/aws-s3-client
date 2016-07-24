@@ -1,0 +1,25 @@
+{
+  "name": "aws-client",
+  "description": "",
+  "main": "index.js",
+  "authors": [
+    "Vamshi Krishna <pvamshi@gmail.com>"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/pvamshi/blog",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "material-design-lite": "^1.1.3",
+    "aws-sdk": "^2.4.9",
+    "mui": "^0.6.8",
+    "angular-material": "^1.0.9",
+    "bulma": "^0.1.0",
+    "font-awesome": "^4.6.3"
+  }
+}
