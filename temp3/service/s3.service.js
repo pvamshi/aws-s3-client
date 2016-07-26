@@ -8,8 +8,8 @@ function S3Service($q) {
   this.uploadFile = uploadFile;
   //===========================================================//
   AWS.config.update({
-    accessKeyId: 'AKIAIJZAMRT2G5VYY5AQ',
-    secretAccessKey: '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'
+    accessKeyId: 'AKIAI5WWDSC5K62JXLLQ',
+    secretAccessKey: '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'
   });
   const bucket = new AWS.S3({
     params: {

@@ -3,12 +3,13 @@
 const watch = require('chokidar').watch;
 const babel = require('babel-core');
 const pathjs = require('path');
+const jade  = require('jade');
 require('shelljs/global');
 const presets = {
   presets: ['es2015']
 };
 
-watch('./src/js/**/*.js')
+watch('./src/**/*.js')
   .on('add', (path) => {
     console.log('file added to watch ' + path);
     let code = cat(path);
@@ -24,6 +25,21 @@ watch('./src/js/**/*.js')
     let destinyFile = './temp/' + path;
     es5Code.to(destinyFile);
   });
+
+watch('./src/**/*.jade')
+  .on('add', (path) => {
+    console.log('file added to watch ' + path);
+    let destinyFile = path;
+    destinyFile = destinyFile.replace('src/','html/').replace(/.jade/,'.html');
+    mkdir('-p', pathjs.dirname(destinyFile));
+    jade.renderFile(path).to(destinyFile);
+  })
+  .on('change', (path) => {
+    console.log('file added to watch ' + path);
+    let destinyFile = path;
+    destinyFile = destinyFile.replace('src/','html/').replace(/.jade/,'.html');
+    jade.renderFile(path).to(destinyFile);
+  })
 
 mkdir('./build');
 ''.to('./build/site.js'); //empty the file everytime the build is run

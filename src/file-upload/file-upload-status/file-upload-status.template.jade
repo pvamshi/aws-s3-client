@@ -1,0 +1,19 @@
+.level
+  .level-left
+    .level-item
+      | {{vm.fileStatus.file.name}} 
+      span.icon(ng-show="vm.fileStatus.uploadDone")
+        i.fa.fa-check
+  .level-right
+    .level-item
+      a.button.is-primary(
+        ng-click="vm.fileStatus.uploadFile()"
+        ng-disabled="vm.fileStatus.percent>0"
+        ) Upload
+
+progress.progress.is-success(
+  value="{{vm.fileStatus.percent}}" 
+  max="100"
+  ng-hide="vm.fileStatus.percent===0 || vm.fileStatus.percent===100"
+  ) {{vm.fileStatus.percent}}%
+

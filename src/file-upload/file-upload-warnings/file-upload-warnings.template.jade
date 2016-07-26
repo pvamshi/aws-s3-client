@@ -1,0 +1,16 @@
+.content
+  .notification(
+      ng-class="vm.showError()?'is-danger':'is-warning'"
+      ng-show="vm.showDialog && vm.warnings && vm.warnings.length")
+    button.delete(ng-click="vm.showDialog=false") &nbsp;
+    div 
+      p
+        | Problems with 
+        span(ng-hide="vm.showError()") few
+        | file(s) selected : 
+
+      ul
+        li(ng-repeat="warning in vm.warnings")
+          p {{warning.file.name}} : {{warning.validity.reason}}
+
+      p(ng-hide="vm.showError()") You can continue uploading the rest of the files or reselect
