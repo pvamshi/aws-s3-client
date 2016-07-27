@@ -1,0 +1,56 @@
+.content
+  .level
+    .level-left
+      .level-item
+        p.control
+          a.button.is-primary Upload
+      .level-item
+        p.control
+          a.button.is-primary Create Folder
+      .level-item
+        p.control.has-icon.has-icon-right
+          input.input(
+            ng-change='vm.search()'
+            ng-model='vm.queryString'
+            placeholder="search file by name"
+            type="text")
+          i.fa.fa-search
+    .level-right
+      .level-item
+        label Page Size
+      .level-item
+        p.control
+          span.select
+            select(
+              ng-model="vm.pageSize"
+              ng-options="option for option in vm.pageOptions"
+              ng-change="vm.$onInit()"
+              )
+
+.content
+  table.table.is-striped.is-bordered.is-narrow
+    thead
+      tr
+        th 
+          | File Name
+          .icon.is-small(ng-click="vm.sortFilesDesc()")
+            i.fa.fa-sort-alpha-desc
+        th Last Modified
+        th Size
+    tbody
+      tr(ng-repeat='file in vm.files')
+        td {{file.Key}}
+        td {{file.LastModified | date : medium}}
+        td {{file.Size}}
+nav.pagination
+  a.button(
+    ng-click="vm.goToPage(vm.pageNumber-1)"
+    ng-disabled="vm.pageNumber===1")
+    | Previous
+  a.button(
+    ng-click="vm.goToPage(vm.pageNumber+1)"
+    ng-disabled="vm.pageNumber===vm.totalPages-1") 
+    | Next page
+  ul
+    li(ng-repeat="page in vm.pages.startingPages")
+      a.button(ng-class="{'is-primary':page==vm.pages.pageNumber}") {{page}}

@@ -11,5 +11,6 @@ angular.module('file-upload.file-upload-warnings',[])
 function FileUploadWarning(){
   const vm = this;
   vm.showError = () => (+vm.validFileLength) === 0;  //convert string to number and compare
+  //TODO: bug: Closing window hides the error page even for next iteration
   vm.showDialog = true;
 }

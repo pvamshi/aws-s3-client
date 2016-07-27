@@ -3,7 +3,7 @@
 const watch = require('chokidar').watch;
 const babel = require('babel-core');
 const pathjs = require('path');
-const jade  = require('jade');
+const jade = require('jade');
 require('shelljs/global');
 const presets = {
   presets: ['es2015']
@@ -30,19 +30,19 @@ watch('./src/**/*.jade')
   .on('add', (path) => {
     console.log('file added to watch ' + path);
     let destinyFile = path;
-    destinyFile = destinyFile.replace('src/','html/').replace(/.jade/,'.html');
+    destinyFile = destinyFile.replace('src/', 'html/').replace(/.jade/, '.html');
     mkdir('-p', pathjs.dirname(destinyFile));
     jade.renderFile(path).to(destinyFile);
   })
   .on('change', (path) => {
     console.log('file added to watch ' + path);
     let destinyFile = path;
-    destinyFile = destinyFile.replace('src/','html/').replace(/.jade/,'.html');
+    destinyFile = destinyFile.replace('src/', 'html/').replace(/.jade/, '.html');
     jade.renderFile(path).to(destinyFile);
   })
 
 mkdir('./build');
-''.to('./build/site.js'); //empty the file everytime the build is run
+''.to('./build/site.js'); 
 
 watch('./temp/**/*.js')
   .on('add', (path) => {
@@ -52,9 +52,10 @@ watch('./temp/**/*.js')
     cat('./temp/**/*.js').to('./build/site.js'); //override whole file
   });
 
-function addiffe(code){
-	return '\n(function(){\n'+code+'\n})();\n';
+function addiffe(code) {
+  return '\n(function(){\n' + code + '\n})();\n';
 }
+
 function transpileToEs5(code) {
   return addiffe(babel.transform(code, presets).code);
 }

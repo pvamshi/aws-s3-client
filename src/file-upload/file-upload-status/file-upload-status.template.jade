@@ -11,7 +11,7 @@
         ng-disabled="vm.fileStatus.percent>0"
         ) Upload
 
-progress.progress.is-success(
+progress.progress.is-success.is-small(
   value="{{vm.fileStatus.percent}}" 
   max="100"
   ng-hide="vm.fileStatus.percent===0 || vm.fileStatus.percent===100"

@@ -9,8 +9,6 @@ function FileUploadService($q) {
   this.uploadFile = uploadFile;
   //===========================================================//
   AWS.config.update({
-    accessKeyId: '',
-    secretAccessKey: ''
   });
   const bucket = new AWS.S3({
     params: {
@@ -18,7 +16,23 @@ function FileUploadService($q) {
     }
   });
 
-  function getFiles() {
+  function getFiles(params) {
+    let files = sessionStorage.getItem('files');
+    if (files) {
+      if (!params || params.pageSize < 1 || params.pageNumber < 1) {
+        return $q.when({
+          meta: params,
+          files: files
+        });
+      }
+      let totalFiles = JSON.parse(files);
+      let resultFiles = processFiles(totalFiles, params);
+      params.totalPages = ~~(totalFiles.length / params.pageSize) + 1;
+      return $q.when({
+        meta: params,
+        files: resultFiles
+      });
+    }
     const deferred = $q.defer();
     bucket.listObjects((err, data) => {
       //TODO: Refactor this silly conditions
@@ -26,7 +40,8 @@ function FileUploadService($q) {
         deferred.reject(err);
       } else {
         if (data && data.Contents) {
-          deferred.resolve(data.Contents);
+          sessionStorage.setItem('files', JSON.stringify(data.Contents));
+          deferred.resolve(processFiles(data.Contents, params));
         } else {
           //TODO: Send proper error
           deferred.reject('no content in data');
@@ -34,6 +49,20 @@ function FileUploadService($q) {
       }
     });
     return deferred.promise;
+  }
+
+  function processFiles(files, params) {
+    if (!!params.searchStr) {
+      let regex = new RegExp(params.searchStr.replace(/\./g,'\\.').replace(/\*/g,'.*'));
+      files = files.filter(file => regex.test(file.Key));
+    }
+    if (!params || params.pageNumber < 1 || params.pageSize < 1) {
+      return files;
+    }
+    if (!!params.sortFiles) {
+      files = _.orderBy(files, ['Key'], [params.sortFiles > 0 ? 'asc' : 'desc']);
+    }
+    return files.splice(params.pageSize * (params.pageNumber - 1), params.pageSize);
   }
 
   function uploadFile(file) {

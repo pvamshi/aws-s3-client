@@ -1,5 +1,6 @@
 angular.module('mainModule', [
-    'file-upload'
+  'file-upload',
+  'file-list'
   ])
   .component('app', {
     controller: controller,
