@@ -1,5 +1,7 @@
 angular.module('file-list', [
-    'file-upload.service'
+    'file-upload.service',
+    'file-list.file-size',
+    'file-list.pagination'
   ])
   .component('fileList', {
     controller: FileListCtrl,
@@ -11,22 +13,44 @@ FileListCtrl.$inject = ['fileUploadService'];
 
 function FileListCtrl(s3) {
   const vm = this;
+  vm.totalFilesCount = 0;
+  vm.$onInit = init;
+
   //===============================
-  vm.pageOptions = [5, 10, 20, 50];
+  vm.pageOptions = [2, 5, 10, 20, 50];
   vm.pageSize = vm.pageOptions[0];
   vm.fetchFiles = fetchFiles;
-  vm.$onInit = () => vm.fetchFiles();
+  // vm.$onInit = () => vm.fetchFiles();
   vm.totalPages = 0;
   vm.goToPage = goToPage;
   vm.pageNumber = 1;
   vm.sortFilesAsc = sortFilesAsc;
   vm.sortFilesDesc = sortFilesDesc;
   vm.ascending = 0;
-  vm.search  = search;
+  vm.search = search;
+  vm.root = '';
+  vm.getFiles = getFiles;
+  vm.settings = {};
+  vm.settings.pagination = {
+    pageSize: 2
+  };
+  vm.updatePaginationSettings = function(pagination) {
+    vm.settings.pagination = pagination;
+    fetchFiles();
+  }
+
+  vm.updatePageSize = function() {
+    vm.settings.pagination.pageSize = vm.pageSize;
+  }
+
+
+  function init() {
+    s3.getTotalFilesCount().then(count => vm.totalFilesCount = count);
+  }
 
   function fetchFiles() {
     console.log('fetched files');
-    s3.getFiles({
+    s3.getFiles(vm.root, {
         pageSize: vm.pageSize,
         pageNumber: vm.pageNumber,
         sortFiles: vm.ascending,
@@ -60,42 +84,22 @@ function FileListCtrl(s3) {
     setPageLimits(data.meta);
   }
 
+  function getFiles(folder) {
+    vm.root = folder;
+    fetchFiles();
+  }
+
   function setPageLimits(meta) {
     vm.pages = {};
-    // vm.pages.firstSpace = true;
-    // vm.pages.lastSpace = true;
-    // vm.pages.endPages = false;
-    // vm.pages.pageNumber = meta.pageNumber;
-    // const total = meta.totalPages;
-    // if (total < 11) {
-    //   vm.pages.firstSpace = false;
-    //   vm.pages.lastSpace = false;
-    //   vm.pages.startingPages = _.range(1, total + 1);
-    // } else {
-    //   vm.pages.startingPages = [1];
-    //   vm.pages.lastPages = [total];
-    //   if (meta.pageNumber === 2) {
-    //     vm.pages.firstSpace = false;
-    //   }
-    //   if (meta.pageNumber === meta.total - 1) {
-    //     vm.pages.lastSpace = false;
-    //   }
-    //   if (meta.pageNumber == 1 || meta.pageNumber == total){
-    //     vm.pages.startingPages=[1,2];
-    //     vm.pages.endPages = true;
-    //   }
-    // }
     vm.pages.pageNumber = meta.pageNumber;
     vm.pageNumber = meta.pageNumber;
     vm.totalPages = meta.totalPages;
     vm.pages.startingPages = [];
-    if (meta.pageNumber < 11) {
-      vm.pages.startingPages = _.range(1, meta.totalPages < 11 ? meta.totalPages : 11);
-    } else if (meta.pageNumber > meta.totalPages - 10) {
-      vm.pages.startingPages = _.range(meta.totalPages - 10, meta.totalPages);
-    } else {
-
-    }
+    let startingPageNumber = (~~((meta.pageNumber - 1) / 10)) * 10 + 1;
+    let endingPageNumber = meta.totalPages < startingPageNumber + 10 ? meta.totalPages + 1 : startingPageNumber + 10;
+    vm.pages.startingPages = _.range(startingPageNumber, endingPageNumber);
+    vm.pages.previousPageGroupExists = startingPageNumber !== 1;
+    vm.pages.nextPageGroupExists = !(endingPageNumber > meta.totalPages);
   }
 
 }

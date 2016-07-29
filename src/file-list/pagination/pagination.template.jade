@@ -1,0 +1,25 @@
+nav.pagination
+  a.button(
+    ng-click="vm.goToPage(vm.pageNumber-1)"
+    ng-disabled="vm.pageNumber===1")
+    | Previous
+  a.button(
+    ng-click="vm.goToPage(vm.pageNumber+1)"
+    ng-disabled="vm.pageNumber===vm.totalPages-1") 
+    | Next page
+  ul
+    li
+      a.button(
+        ng-show="vm.previousPageGroupExists"
+        ng-click="vm.goToPage(vm.startingPageNumber-1)")
+        | <<
+    li(ng-repeat="page in vm.pages")
+      a.button(
+        ng-click="vm.goToPage(page)"
+        ng-class="{'is-primary':page==vm.pageNumber}") 
+        | {{page}}
+    li
+      a.button(
+        ng-click="vm.goToPage(vm.nextStartingPageNumber)"
+        ng-show="vm.nextPageGroupExists") 
+        | >>

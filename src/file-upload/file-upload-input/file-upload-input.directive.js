@@ -49,7 +49,7 @@ function FileUploadInput() {
           fileValidity.reason = "File size cannot be 0";
           return fileValidity;
         }
-        if (file.size > 10240000) {
+        if (file.size > 10000000) {
           fileValidity.valid = false;
           fileValidity.reason = "File size cannot exceed 10MB";
         }

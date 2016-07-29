@@ -1,0 +1,4 @@
+<nav class="pagination"><a ng-click="vm.goToPage(vm.pageNumber-1)" ng-disabled="vm.pageNumber===1" class="button">Previous</a><a ng-click="vm.goToPage(vm.pageNumber+1)" ng-disabled="vm.pageNumber===vm.totalPages-1" class="button"> 
+Next page</a><ul><li><a ng-show="vm.previousPageGroupExists" ng-click="vm.goToPage(vm.startingPageNumber-1)" class="button"><<</a></li><li ng-repeat="page in vm.pages"><a ng-click="vm.goToPage(page)" ng-class="{'is-primary':page==vm.pageNumber}" class="button"> 
+{{page}}</a></li><li><a ng-click="vm.goToPage(vm.nextStartingPageNumber)" ng-show="vm.nextPageGroupExists" class="button"> 
+>></a></li></ul></nav>
