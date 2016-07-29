@@ -11,8 +11,6 @@ function FileUploadService($q) {
   this.getFilesForSettings = getFilesForSettings;
   //===========================================================//
   AWS.config.update({
-    accessKeyId: 'AKIAJJNYFH2AX6L3KXSQ',
-    secretAccessKey: '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'
   });
   const bucket = new AWS.S3({
     params: {
@@ -20,8 +18,10 @@ function FileUploadService($q) {
     }
   });
 
-  function getFilesForSettings(folder, settings){
-    
+  function getFilesForSettings(folder, settings) {
+    let files = getFilesFromStorage(folder);
+    files = filterFiles(files, settings.queryString);
+    return $q.when(files.splice(settings.pageSize * (settings.pageNumber - 1), settings.pageSize));
   }
 
   function getTotalFilesCount(folder) {
@@ -41,6 +41,14 @@ function FileUploadService($q) {
     }
     return;
 
+  }
+
+  function filterFiles(files, queryString) {
+    if (queryString && files) {
+      let regex = new RegExp(queryString.replace(/\./g, '\\.').replace(/\*/g, '.*'));
+      files = files.filter(file => regex.test(file.name));
+    }
+    return files;
   }
 
   function fetchFiles() {

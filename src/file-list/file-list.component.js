@@ -15,54 +15,33 @@ function FileListCtrl(s3) {
   const vm = this;
   vm.totalFilesCount = 0;
   vm.$onInit = init;
-
+  vm.updatePageNumber = updatePageNumber;
+  vm.fetchFiles = fetchFiles;
   //===============================
   vm.pageOptions = [2, 5, 10, 20, 50];
   vm.pageSize = vm.pageOptions[0];
-  vm.fetchFiles = fetchFiles;
-  // vm.$onInit = () => vm.fetchFiles();
-  vm.totalPages = 0;
-  vm.goToPage = goToPage;
-  vm.pageNumber = 1;
-  vm.sortFilesAsc = sortFilesAsc;
-  vm.sortFilesDesc = sortFilesDesc;
-  vm.ascending = 0;
-  vm.search = search;
   vm.root = '';
-  vm.getFiles = getFiles;
-  vm.settings = {};
-  vm.settings.pagination = {
-    pageSize: 2
+  vm.settings = {
+    pageSize: vm.pageOptions[0]
   };
-  vm.updatePaginationSettings = function(pagination) {
-    vm.settings.pagination = pagination;
-    fetchFiles();
-  }
 
   vm.updatePageSize = function() {
-    vm.settings.pagination.pageSize = vm.pageSize;
+    vm.settings.pageSize = vm.pageSize;
   }
 
+  function updatePageNumber(pageNumber) {
+    vm.settings.pageNumber = pageNumber;
+    fetchFiles();
+  }
 
   function init() {
     s3.getTotalFilesCount().then(count => vm.totalFilesCount = count);
   }
 
   function fetchFiles() {
-    console.log('fetched files');
-    s3.getFiles(vm.root, {
-        pageSize: vm.pageSize,
-        pageNumber: vm.pageNumber,
-        sortFiles: vm.ascending,
-        searchStr: vm.queryString
-      })
+    s3.getFilesForSettings(vm.root, vm.settings)
       .then(addFiles)
       .catch(err => console.log(err));
-  }
-
-  function goToPage(pageNumber) {
-    vm.pageNumber = pageNumber;
-    fetchFiles();
   }
 
   function sortFilesAsc() {
@@ -75,31 +54,7 @@ function FileListCtrl(s3) {
     fetchFiles();
   }
 
-  function search() {
-    fetchFiles();
-  }
-
   function addFiles(data) {
-    vm.files = data.files;
-    setPageLimits(data.meta);
+    vm.files = data;
   }
-
-  function getFiles(folder) {
-    vm.root = folder;
-    fetchFiles();
-  }
-
-  function setPageLimits(meta) {
-    vm.pages = {};
-    vm.pages.pageNumber = meta.pageNumber;
-    vm.pageNumber = meta.pageNumber;
-    vm.totalPages = meta.totalPages;
-    vm.pages.startingPages = [];
-    let startingPageNumber = (~~((meta.pageNumber - 1) / 10)) * 10 + 1;
-    let endingPageNumber = meta.totalPages < startingPageNumber + 10 ? meta.totalPages + 1 : startingPageNumber + 10;
-    vm.pages.startingPages = _.range(startingPageNumber, endingPageNumber);
-    vm.pages.previousPageGroupExists = startingPageNumber !== 1;
-    vm.pages.nextPageGroupExists = !(endingPageNumber > meta.totalPages);
-  }
-
 }

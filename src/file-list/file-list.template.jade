@@ -10,9 +10,9 @@
       .level-item
         p.control.has-icon.has-icon-right
           input.input(
-            ng-change='vm.search()'
-            ng-model='vm.queryString'
+            ng-model='vm.settings.queryString'
             placeholder="search file by name"
+            ng-change="vm.fetchFiles()"
             type="text")
           i.fa.fa-search
     .level-right
@@ -41,9 +41,9 @@
       tr(ng-repeat='file in vm.files')
         td {{file.name}}
         td {{file.lastModified | date : medium}}
-        td {{file.size}}
+        td {{file.size | filesize}}
 pagination(
-  pagination="vm.settings.pagination"
-  files = "vm.files",
   total-files-count="vm.totalFilesCount",
-  page-size="vm.pageSize")
+  page-size="vm.pageSize"
+  update-file-list = "vm.updatePageNumber(pageNumber)"
+  )

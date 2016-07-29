@@ -10,7 +10,7 @@ function fileSize() {
     } else if (sizeInBytes / 1000 > 1) {
       return _.round((sizeInBytes / 1000)) + ' KB';
     } else {
-      return sizeInBytes + 'B';
+      return sizeInBytes + ' B';
     }
   }
 }

@@ -3,10 +3,9 @@ angular.module('file-list.pagination', [])
     controller:   PaginationCtrl,
     controllerAs: 'vm',
     bindings: {
-      files:           '<',
       totalFilesCount: '<',
       pageSize:        '<',
-      updateFileList:  '<'
+      updateFileList:  '&'
     },
     templateUrl: 'html/file-list/pagination/pagination.template.html'
   });
@@ -30,6 +29,10 @@ function PaginationCtrl() {
     vm.nextPageGroupExists     = !(nextStartingPageNumber > totalPages);
     vm.startingPageNumber      = startingPageNumber;
     vm.nextStartingPageNumber  = nextStartingPageNumber;
+
+    vm.updateFileList({
+      pageNumber: vm.pageNumber
+    });
   }
 
   function changed() {
@@ -41,6 +44,9 @@ function PaginationCtrl() {
     if (pageNumber < vm.startingPageNumber || pageNumber === vm.nextStartingPageNumber || pageNumber > vm.nextStartingPageNumber) {
       init();
     }
+    vm.updateFileList({
+      pageNumber: vm.pageNumber
+    });
   }
 
 }
