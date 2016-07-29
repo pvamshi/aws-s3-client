@@ -26,7 +26,10 @@
               ng-options="option for option in vm.pageOptions"
               ng-change="vm.updatePageSize()"
               )
-
+.content(ng-show='vm.root && vm.root !=="root"')
+  a(ng-repeat='breadCrumb in vm.breadCrumbs'
+    ng-click="vm.setFolder(breadCrumb[1])"
+    ) {{breadCrumb[0]}} /
 .content
   table.table.is-striped.is-bordered.is-narrow
     thead
@@ -39,7 +42,9 @@
         th Size
     tbody
       tr(ng-repeat='file in vm.files')
-        td {{file.name}}
+        td(ng-hide='file.folder') {{file.name}}
+        td(ng-show='file.folder')
+          a(ng-click="vm.setRoot(file)"){{file.name}}
         td {{file.lastModified | date : medium}}
         td {{file.size | filesize}}
 pagination(

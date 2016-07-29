@@ -17,6 +17,10 @@ function FileListCtrl(s3) {
   vm.$onInit = init;
   vm.updatePageNumber = updatePageNumber;
   vm.fetchFiles = fetchFiles;
+  vm.setRoot = setRoot;
+  vm.breadCrumbs = [];
+  vm.setFolder = setFolder;
+  vm.root = '';
   //===============================
   vm.pageOptions = [2, 5, 10, 20, 50];
   vm.pageSize = vm.pageOptions[0];
@@ -35,7 +39,8 @@ function FileListCtrl(s3) {
   }
 
   function init() {
-    s3.getTotalFilesCount().then(count => vm.totalFilesCount = count);
+    vm.settings.queryString = '';
+    s3.getTotalFilesCount(vm.root).then(count => vm.totalFilesCount = count);
   }
 
   function fetchFiles() {
@@ -56,5 +61,35 @@ function FileListCtrl(s3) {
 
   function addFiles(data) {
     vm.files = data;
+  }
+
+  function setRoot(file) {
+    vm.root = file.folderPath + '/' + file.name;
+    setBreadCrumbs();
+    init();
+  }
+
+  function setBreadCrumbs() {
+    if (!vm.root) {
+      return;
+    }
+    let folders = vm.root.split('/');
+    let breadCrumbs = folders.reduce(aggregatepath, []);
+
+    function aggregatepath(finalArray, folder) {
+      if (finalArray.length == 0) {
+        finalArray.push(folder);
+      } else {
+        let lastElem = finalArray[finalArray.length - 1];
+        finalArray.push(lastElem + '/' + folder);
+      }
+      return finalArray;
+    }
+    vm.breadCrumbs = _.zip(folders, breadCrumbs);
+  }
+  function setFolder(folder){
+    vm.root=folder;
+    setBreadCrumbs();
+    init();
   }
 }

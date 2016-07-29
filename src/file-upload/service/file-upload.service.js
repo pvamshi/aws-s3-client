@@ -4,8 +4,6 @@ angular.module('file-upload.service', [])
 FileUploadService.$inject = ['$q'];
 
 function FileUploadService($q) {
-
-  this.getFiles = getFiles;
   this.uploadFile = uploadFile;
   this.getTotalFilesCount = getTotalFilesCount;
   this.getFilesForSettings = getFilesForSettings;
@@ -71,49 +69,6 @@ function FileUploadService($q) {
       }
     });
     return deferred.promise;
-  }
-
-  function getFiles(root) {
-    let files = sessionStorage.getItem(root || 'root');
-    if (files) {
-      return $q.when({
-        meta: {},
-        files: JSON.parse(files)
-      });
-    }
-    const deferred = $q.defer();
-    bucket.listObjects((err, data) => {
-      if (err) {
-        deferred.reject(err);
-      } else {
-        if (data && data.Contents) {
-          saveFiles(data.Contents);
-          deferred.resolve({
-            files: JSON.parse(sessionStorage.getItem('root')),
-            meta: {}
-          });
-        } else {
-          //TODO: Send proper error
-          deferred.reject('no content in data');
-        }
-      }
-    });
-    return deferred.promise;
-  }
-
-  function processFiles(files, params) {
-    return files;
-    if (!!params.searchStr) {
-      let regex = new RegExp(params.searchStr.replace(/\./g, '\\.').replace(/\*/g, '.*'));
-      files = files.filter(file => regex.test(file.Key));
-    }
-    if (!params || params.pageNumber < 1 || params.pageSize < 1) {
-      return files;
-    }
-    if (!!params.sortFiles) {
-      files = _.orderBy(files, ['Key'], [params.sortFiles > 0 ? 'asc' : 'desc']);
-    }
-    return files.splice(params.pageSize * (params.pageNumber - 1), params.pageSize);
   }
 
   function saveFiles(files) {
