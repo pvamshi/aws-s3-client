@@ -1,0 +1,36 @@
+.content
+  .level
+    .level-left
+      .level-item
+        p.control.has-icon.has-icon-right
+          input.input(
+            ng-model="vm.settings.filter.name"
+            placeholder="search file by name"
+            ng-change="vm.fetchFiles()"
+            type="text")
+          i.fa.fa-search
+      .level-item
+        filter-size(
+          filter-settings = "vm.settings.filter.size"
+          update-files = "vm.setSizeFilter(filterSettings)"
+          )
+    .level-right
+      .level-item
+        page-size(set-page-size="vm.setPageSize(pageSize)")
+
+file-upload
+breadcrumbs(
+  set-folder="vm.setFolder(folder)"
+  root="vm.root")
+
+file-list(files = "vm.files"
+sort = "vm.settings.sort"
+set-sort-settings = "vm.setSortSettings(sortSettings)"
+set-root-folder = "vm.setRootFolder(root)"
+)
+
+pagination(
+  total-files-count="vm.totalFilesCount",
+  page-size="vm.settings.pageSize"
+  update-file-list = "vm.updatePageNumber(pageNumber)"
+  )

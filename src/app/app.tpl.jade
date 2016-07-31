@@ -1,50 +1,25 @@
-.box
+section.hero.is-info.is-bold
+  .hero-head
+    .container
+      nav.nav
+        .nav-left
+          h2.nav-item AWS S3 Client
+        .nav-menu.nav-right
+          .nav-item
+            a.has-icon.has-icon-right(ng-click="" ng-href="") Upload
+              span.icon
+                i.fa.fa-cloud-upload
+          .nav-item
+            a.has-icon.has-icon-right(ng-click="" ng-href="") 
+              | File List
+              span.icon
+                i.fa.fa-table
+section.section
   .container
-    .content
-      .level
-        .level-left
-          .level-item
-            p.control
-              a.button.is-primary(ng-click="vm.showFileUpload=true")
-                | Upload
-          .level-item
-            create-folder(root="vm.root")
-          .level-item
-            p.control.has-icon.has-icon-right
-              input.input(
-                ng-model="vm.settings.filter.name"
-                placeholder="search file by name"
-                ng-change="vm.fetchFiles()"
-                type="text")
-              i.fa.fa-search
-          .level-item
-            filter-size(
-              filter-settings = "vm.settings.filter.size"
-              update-files = "vm.setSizeFilter(filterSettings)"
-              )
-        .level-right
-          .level-item
-            page-size(set-page-size="vm.setPageSize(pageSize)")
-
-    breadcrumbs(
-      set-folder="vm.setFolder(folder)"
-      root="vm.root")
-
-    file-list(files = "vm.files"
-    sort = "vm.settings.sort"
-    set-sort-settings = "vm.setSortSettings(sortSettings)"
-    set-root-folder = "vm.setRootFolder(root)"
-    )
-
-    pagination(
-      total-files-count="vm.totalFilesCount",
-      page-size="vm.settings.pageSize"
-      update-file-list = "vm.updatePageNumber(pageNumber)"
-      )
+    files
 .modal(ng-class="{'is-active': vm.showFileUpload}")
   .modal-background
   .modal-container
     .modal-content
-      file-upload
     button.modal-close(ng-click="vm.showFileUpload=false")
 

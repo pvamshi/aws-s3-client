@@ -10,8 +10,6 @@ function FileUploadService($q) {
   this.createFolder = createFolder;
   //===========================================================//
   AWS.config.update({
-    accessKeyId: "AKIAITGZKS3MPTYS4RJA",
-    secretAccessKey: "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"
   });
 
   const bucket = new AWS.S3({

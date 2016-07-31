@@ -1,16 +1,15 @@
-.box
-  file-upload-warnings(
-    warnings="vm.invalidFiles"
-    valid-file-length="{{vm.fileUploadStatus.length}}")
-  .content
-    file-upload-input(
-      set-file-list="vm.setFileList(files)"
-      set-invalid-files="vm.setInvalidFiles(files)")
-    p.content(ng-repeat="fileStatus in vm.fileUploadStatus")
-      file-upload-status(file-status='fileStatus')
-    p.content
-      a.button.is-primary(
-        ng-click="vm.uploadAll()"
-        ng-show="vm.fileUploadStatus && vm.fileUploadStatus.length>1"
-        ng-disabled="vm.uploadAllInvalid()"
-        ) Upload All
+file-upload-warnings(
+  warnings="vm.invalidFiles"
+  valid-file-length="{{vm.fileUploadStatus.length}}")
+.content
+  file-upload-input(
+    set-file-list="vm.setFileList(files)"
+    set-invalid-files="vm.setInvalidFiles(files)")
+  p.content(ng-repeat="fileStatus in vm.fileUploadStatus")
+    file-upload-status(file-status='fileStatus')
+  p.content
+    a.button.is-primary(
+      ng-click="vm.uploadAll()"
+      ng-show="vm.fileUploadStatus && vm.fileUploadStatus.length>1"
+      ng-disabled="vm.uploadAllInvalid()"
+      ) Upload All
