@@ -1,0 +1,12 @@
+.level
+  .level-left
+    .level-item
+      label Page Size
+  .level-right
+    .level-item
+      span.select
+        select(
+          ng-model="vm.pageSize"
+          ng-options="option for option in vm.pageOptions"
+          ng-change="vm.updatePageSize()"
+          )

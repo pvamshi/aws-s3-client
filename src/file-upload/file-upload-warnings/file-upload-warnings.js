@@ -6,7 +6,7 @@ angular.module('file-upload.file-upload-warnings',[])
       warnings: '<',
       validFileLength:'@'
     },
-    templateUrl:'html/file-upload/file-upload-warnings/file-upload-warnings.template.html'
+    templateUrl:'file-upload/file-upload-warnings/file-upload-warnings.template.html'
   });
 function FileUploadWarning(){
   const vm = this;

@@ -5,7 +5,7 @@ angular.module('file-upload.file-upload-status',[])
     bindings: {
       fileStatus : '<'
     },
-    templateUrl: 'html/file-upload/file-upload-status/file-upload-status.template.html'
+    templateUrl: 'file-upload/file-upload-status/file-upload-status.template.html'
   });
 
 function FileUploadStatus(){}

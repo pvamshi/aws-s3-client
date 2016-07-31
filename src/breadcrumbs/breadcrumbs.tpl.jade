@@ -1,0 +1,4 @@
+.content(ng-show='vm.root && vm.root !=="root"')
+  a(ng-repeat='breadCrumb in vm.breadCrumbs'
+    ng-click="vm.openFolder(breadCrumb[1])"
+    ) {{breadCrumb[0]}} /

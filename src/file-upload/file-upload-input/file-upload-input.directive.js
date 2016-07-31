@@ -56,7 +56,7 @@ function FileUploadInput() {
         return fileValidity;
       }
     },
-    templateUrl: 'html/file-upload/file-upload-input/file-upload-input.template.html'
+    templateUrl: 'file-upload/file-upload-input/file-upload-input.template.html'
   };
   return directive;
 }

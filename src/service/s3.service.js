@@ -1,5 +1,5 @@
-angular.module('file-upload.service', [])
-  .service('fileUploadService', FileUploadService);
+angular.module('s3', [])
+  .service('s3Service', FileUploadService);
 
 FileUploadService.$inject = ['$q'];
 
@@ -19,7 +19,15 @@ function FileUploadService($q) {
   function getFilesForSettings(folder, settings) {
     let files = getFilesFromStorage(folder);
     files = filterFiles(files, settings.queryString);
+    files = sort(files, settings.sort);
     return $q.when(files.splice(settings.pageSize * (settings.pageNumber - 1), settings.pageSize));
+  }
+
+  function sort(files, sortSettings) {
+    if (!sortSettings) {
+      return files;
+    }
+    return _.orderBy(files, _.keys(sortSettings), _.keys(sortSettings).map(k => sortSettings[k]));
   }
 
   function getTotalFilesCount(folder) {
@@ -84,7 +92,6 @@ function FileUploadService($q) {
   }
 
   function getFile(file) {
-    console.log(file);
     let folder = false;
     let keySplit = file.Key.split('/');
     let fileName = keySplit.pop();
@@ -101,7 +108,7 @@ function FileUploadService($q) {
       this.folder = folder;
       this.folderPath = folderPath;
       this.name = name;
-      this.lastModified = lastModified;
+      this.lastModified = new Date(lastModified).getTime();
       this.size = size;
     }
   }

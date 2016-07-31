@@ -7,7 +7,7 @@ angular.module('file-upload', [
   .component('fileUpload', {
     controller: FileUploadCtrl,
     controllerAs: 'vm',
-    templateUrl: 'html/file-upload/file-upload.template.html'
+    templateUrl: 'file-upload/file-upload.template.html'
   });
 
 FileUploadCtrl.$inject = ['fileUploadService'];
