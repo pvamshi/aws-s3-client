@@ -1,0 +1,21 @@
+p.control.has-addons.has-addons-centered
+  input.input(
+    ng-model="vm.filterSettings.max"
+    placeholder="file size greater than"
+    ng-change="vm.fetchFiles()"
+    type="number")
+  span.select
+    select(
+      ng-model="vm.filterSettings.maxTimes"
+      ng-options="obj.value as obj.text for obj in vm.options")
+  input.input(
+    ng-model="vm.filterSettings.min"
+    placeholder="file size less than"
+    ng-change="vm.fetchFiles()"
+    type="number")
+  span.select
+    select(
+      ng-model="vm.filterSettings.minTimes"
+      ng-options="obj.value as obj.text for obj in vm.options")
+  a.button.is-success(ng-click="vm.filterFiles()")
+    | Filter

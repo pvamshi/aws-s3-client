@@ -1,24 +1,28 @@
-angular.module('s3', [])
-  .service('s3Service', FileUploadService);
+angular.module("s3", [])
+  .service("s3Service", FileUploadService);
 
-FileUploadService.$inject = ['$q'];
+FileUploadService.$inject = ["$q"];
 
 function FileUploadService($q) {
   this.uploadFile = uploadFile;
   this.getTotalFilesCount = getTotalFilesCount;
   this.getFilesForSettings = getFilesForSettings;
+  this.createFolder = createFolder;
   //===========================================================//
   AWS.config.update({
+    accessKeyId: "AKIAITGZKS3MPTYS4RJA",
+    secretAccessKey: "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"
   });
+
   const bucket = new AWS.S3({
     params: {
-      Bucket: 'pvamshi'
+      Bucket: "pvamshi"
     }
   });
 
   function getFilesForSettings(folder, settings) {
     let files = getFilesFromStorage(folder);
-    files = filterFiles(files, settings.queryString);
+    files = filterFiles(files, settings.filter);
     files = sort(files, settings.sort);
     return $q.when(files.splice(settings.pageSize * (settings.pageNumber - 1), settings.pageSize));
   }
@@ -39,20 +43,28 @@ function FileUploadService($q) {
   }
 
   function getFilesFromStorage(folder) {
-    const storageFileJsonStr = sessionStorage.getItem(folder || 'root');
+    const storageFileJsonStr = sessionStorage.getItem(folder || "root");
     try {
       return JSON.parse(storageFileJsonStr);
     } catch (e) {
-      console.error('error while parsing storage json');
+      console.error("error while parsing storage json");
     }
     return;
 
   }
 
-  function filterFiles(files, queryString) {
-    if (queryString && files) {
-      let regex = new RegExp(queryString.replace(/\./g, '\\.').replace(/\*/g, '.*'));
+  function filterFiles(files, filterSettings) {
+    if (filterSettings && filterSettings.name && files) {
+      let regex = new RegExp(filterSettings.name.replace(/\./g, "\\.").replace(/\*/g, ".*"));
       files = files.filter(file => regex.test(file.name));
+    }
+    if (filterSettings && files && filterSettings.size) {
+      if (filterSettings.size.min && filterSettings.size.min > 0) {
+        files = files.filter(file => file.size > (filterSettings.size.min * filterSettings.size.minTimes));
+      }
+      if (filterSettings.size.max && filterSettings.size.max > 0) {
+        files = files.filter(file => file.size < (filterSettings.size.max * filterSettings.size.maxTimes));
+      }
     }
     return files;
   }
@@ -67,12 +79,12 @@ function FileUploadService($q) {
         if (data && data.Contents) {
           saveFiles(data.Contents);
           deferred.resolve({
-            files: JSON.parse(sessionStorage.getItem('root')),
+            files: JSON.parse(sessionStorage.getItem("root")),
             meta: {}
           });
         } else {
           //TODO: Send proper error
-          deferred.reject('no content in data');
+          deferred.reject("no content in data");
         }
       }
     });
@@ -93,13 +105,13 @@ function FileUploadService($q) {
 
   function getFile(file) {
     let folder = false;
-    let keySplit = file.Key.split('/');
+    let keySplit = file.Key.split("/");
     let fileName = keySplit.pop();
-    if (fileName == '') {
+    if (fileName == "") {
       folder = true;
       fileName = keySplit.pop();
     }
-    let parent = 'root' + (keySplit.length > 0 ? '/' + keySplit.join('/') : '');
+    let parent = "root" + (keySplit.length > 0 ? "/" + keySplit.join("/") : "");
     return new File(folder, parent, fileName, file.LastModified, file.Size);
   }
 
@@ -116,9 +128,23 @@ function FileUploadService($q) {
   function uploadFile(file) {
     const deferred = $q.defer();
     bucket.upload(file)
-      .on('httpUploadProgress', evt => deferred.notify(getPercent(evt)))
+      .on("httpUploadProgress", evt => deferred.notify(getPercent(evt)))
       .send((err, data) => err ? deferred.reject(err) : deferred.resolve(data));
     return deferred.promise;
+  }
+
+  function createFolder(root, folder) {
+    let folderKey = "";
+    if (root && root !== "root") {
+      folderKey = root + "/" + folder + "/";
+    } else {
+      folderKey = "pvamshi/" + folder + "/";
+    }
+    bucket.createBucket({
+      Bucket: folderKey
+    }, function(err, data) {
+      console.log("bucket creation: " + err ? "FAIL" : "SUCCESS");
+    });
   }
 
   function getPercent(evt) {

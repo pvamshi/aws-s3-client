@@ -5,18 +5,23 @@
         .level-left
           .level-item
             p.control
-              a.button.is-primary Upload
+              a.button.is-primary(ng-click="vm.showFileUpload=true")
+                | Upload
           .level-item
-            p.control
-              a.button.is-primary Create Folder
+            create-folder(root="vm.root")
           .level-item
             p.control.has-icon.has-icon-right
               input.input(
-                ng-model="vm.settings.queryString"
+                ng-model="vm.settings.filter.name"
                 placeholder="search file by name"
                 ng-change="vm.fetchFiles()"
                 type="text")
               i.fa.fa-search
+          .level-item
+            filter-size(
+              filter-settings = "vm.settings.filter.size"
+              update-files = "vm.setSizeFilter(filterSettings)"
+              )
         .level-right
           .level-item
             page-size(set-page-size="vm.setPageSize(pageSize)")
@@ -36,3 +41,10 @@
       page-size="vm.settings.pageSize"
       update-file-list = "vm.updatePageNumber(pageNumber)"
       )
+.modal(ng-class="{'is-active': vm.showFileUpload}")
+  .modal-background
+  .modal-container
+    .modal-content
+      file-upload
+    button.modal-close(ng-click="vm.showFileUpload=false")
+

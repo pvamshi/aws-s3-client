@@ -1,0 +1,30 @@
+.container
+  p.control
+    a.button.is-primary(ng-click="vm.showCreateFolder = true")
+      | Create Folder
+
+.modal(ng-class="{'is-active': vm.showCreateFolder}")
+  .modal-background
+  .modal-container
+    .modal-content
+      .box
+        label.label Folder Name
+        p.control
+          input.input(
+            type="text"
+            ng-class="{'is-danger':vm.folderExists}"
+            ng-model="vm.folderName"
+            ng-change="vm.checkFolder()"
+            placeholder="Type folder name")
+        .control.is-grouped
+          p.control
+            a.button.is-primary(
+              ng-disabled="vm.folderExists"
+              ng-click = "vm.createFolder()"
+              )
+              | Create
+          p.control
+            a.button(ng-click="vm.showCreateFolder=false")
+              | Cancel
+        button.modal-close(ng-click="vm.showCreateFolder=false")
+

@@ -4,6 +4,8 @@ angular.module("app", [
     "page-size",
     "breadcrumbs",
     "pagination",
+    "create-folder",
+    "filter-size",
     "s3"
   ])
   .component("app", {
@@ -24,9 +26,20 @@ function AppCtrl(s3) {
   vm.fetchFiles = fetchFiles;
   vm.setSortSettings = setSortSettings;
   vm.setRootFolder = setRootFolder;
+  vm.setSizeFilter = setSizeFilter;
   vm.settings = {};
   vm.totalFilesCount = 0;
   vm.settings.sort = {};
+  vm.settings.filter = {};
+  vm.settings.filter.name = "";
+  vm.settings.filter.size = {
+    min: "",
+    minTimes:1,
+    max: "",
+    maxTimes:1
+  };
+
+  vm.root = "root";
 
   function setPageSize(pageSize) {
     vm.settings.pageSize = pageSize;
@@ -38,6 +51,7 @@ function AppCtrl(s3) {
 
   function init() {
     vm.settings.queryString = "";
+    vm.settings.filterSize = "";
     s3.getTotalFilesCount(vm.root).then(count => vm.totalFilesCount = count);
   }
 
@@ -65,6 +79,11 @@ function AppCtrl(s3) {
   function setRootFolder(root) {
     vm.root = root;
     init();
+  }
+
+  function setSizeFilter(filterSettings){
+    vm.settings.filter.size = filterSettings;
+    fetchFiles();
   }
 
 }

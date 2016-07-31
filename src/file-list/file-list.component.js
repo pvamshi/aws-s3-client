@@ -24,6 +24,7 @@ function FileListCtrl(s3) {
   vm.sortFileBySize = sortFile("size");
   vm.sortFileByDate = sortFile("lastModified");
   vm.setRoot = setRoot;
+  vm.showFolderInput = true;
   //===============================
 
   function sortFile(param) {
