@@ -217,7 +217,7 @@ function FileUploadInput() {
           valid: true,
           reason: ''
         };
-        if (file.type !== 'text/csv' && file.type !== 'text/xls') {
+        if (file.type !== 'text/csv' && file.type !== 'application/vnd.ms-excel') {
           fileValidity.valid = false;
           fileValidity.reason = "File type need to be either .csv or .xls";
           return fileValidity;
