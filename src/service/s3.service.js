@@ -37,7 +37,7 @@ function FileUploadService($q) {
     // const files =!forceRefresh &&  getFilesFromStorage(folder);
     // if (files) {
     //   return $q.when(files.length);
-    }
+    // }
     return fetchFiles().then(response => response && response.files && response.files.length);
   }
 

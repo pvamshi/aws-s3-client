@@ -1,7 +1,7 @@
 p.control.has-addons.has-addons-centered
   input.input(
     ng-model="vm.filterSettings.max"
-    placeholder="file size greater than"
+    placeholder="file size less than"
     ng-change="vm.fetchFiles()"
     type="number")
   span.select
@@ -10,7 +10,7 @@ p.control.has-addons.has-addons-centered
       ng-options="obj.value as obj.text for obj in vm.options")
   input.input(
     ng-model="vm.filterSettings.min"
-    placeholder="file size less than"
+    placeholder="file size greater than"
     ng-change="vm.fetchFiles()"
     type="number")
   span.select
