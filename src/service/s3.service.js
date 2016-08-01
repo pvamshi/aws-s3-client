@@ -11,6 +11,7 @@ function FileUploadService($q) {
   this.abortUpload = abortUpload;
   this.getSettings = getSettings;
   this.setSettings = setSettings;
+  this.testSettings = testSettings;
 
   let storedSettings;
 
@@ -48,7 +49,6 @@ function FileUploadService($q) {
       console.error("error while parsing storage json");
     }
     return;
-
   }
 
   function filterFiles(files, filterSettings) {
@@ -167,10 +167,22 @@ function FileUploadService($q) {
     });
     bucket = new AWS.S3({
       params: {
-        Bucket: "pvamshi"
+        Bucket: settings.bucket
       }
     });
 
+  }
+
+  function testSettings(settings) {
+    AWS.config.update({
+      accessKeyId: settings.accessKeyId,
+      secretAccessKey: settings.secretAccessKey
+    });
+    let s3 = new AWS.S3({
+      params: {
+        Bucket: settings.bucket
+      }
+    });
   }
 
 }

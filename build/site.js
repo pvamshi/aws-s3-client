@@ -619,6 +619,7 @@ function FileUploadService($q) {
   this.abortUpload = abortUpload;
   this.getSettings = getSettings;
   this.setSettings = setSettings;
+  this.testSettings = testSettings;
 
   var storedSettings = void 0;
 
@@ -790,7 +791,19 @@ function FileUploadService($q) {
     });
     bucket = new AWS.S3({
       params: {
-        Bucket: "pvamshi"
+        Bucket: settings.bucket
+      }
+    });
+  }
+
+  function testSettings(settings) {
+    AWS.config.update({
+      accessKeyId: settings.accessKeyId,
+      secretAccessKey: settings.secretAccessKey
+    });
+    var s3 = new AWS.S3({
+      params: {
+        Bucket: settings.bucket
       }
     });
   }
@@ -811,6 +824,7 @@ angular.module("settings", ["s3"]).component("settings", {
 });
 
 SettingsCtrl.$inject = ['s3Service'];
+
 function SettingsCtrl(s3) {
   var vm = this;
 
@@ -818,9 +832,11 @@ function SettingsCtrl(s3) {
   vm.$onChanges = init;
   vm.saveSettings = saveSettings;
   vm.updateShowSettings = updateShowSettings;
+  vm.testSettings = testSettings;
 
   vm.settings;
   vm.loading = false;
+  vm.loadingTest = false;
 
   function init() {
     vm.settings = s3.getSettings;
@@ -830,7 +846,8 @@ function SettingsCtrl(s3) {
     vm.loading = true;
     s3.setSettings({
       accessKeyId: vm.accessKey,
-      secretAccessKey: vm.secretKey
+      secretAccessKey: vm.secretKey,
+      bucket: vm.bucket
     });
     vm.loading = false;
     vm.updateShowSettings(false);
@@ -839,6 +856,15 @@ function SettingsCtrl(s3) {
   function updateShowSettings(show) {
     vm.setShowSettings({
       showSettings: show
+    });
+  }
+
+  function testSettings() {
+    vm.loadingTest = true;
+    s3.testSettings({
+      accessKeyId: vm.accessKey,
+      secretAccessKey: vm.secretKey,
+      bucket: vm.bucket
     });
   }
 }

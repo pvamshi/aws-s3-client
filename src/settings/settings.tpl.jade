@@ -9,7 +9,7 @@
             input.input(
               type="text"
               ng-model="vm.accessKey"
-              placeholder="Access Key looks like 'AKIAIOSFODNN7EXAMPLE'"
+              placeholder="Access Key ID looks like 'AKIAIOSFODNN7EXAMPLE'"
               )
           label.label Secret Access Key
           p.control
@@ -18,10 +18,18 @@
               ng-model="vm.secretKey"
               placeholder="Secret Access Key looks like 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY'"
               )
+          label.label Bucket (root folder)
           p.control
-            a.button.is-primary(
-              ng-class="{'is-loading': vm.loading}"
-              ng-disabled="!(vm.accessKey && vm.secretKey)"
-              ng-click="vm.saveSettings()")
-              | Save
+            input.input(
+              type="text"
+              ng-model="vm.bucket"
+              placeholder="Can be 'bucket1' or 'bucket1/folder1/folder2'"
+              )
+          .control.is-grouped
+            p.control
+              a.button.is-primary(
+                ng-class="{'is-loading': vm.loading}"
+                ng-disabled="!(vm.accessKey && vm.secretKey && vm.bucket)"
+                ng-click="vm.saveSettings()")
+                | Save
   button.modal-close(ng-click="vm.updateShowSettings(false)")
