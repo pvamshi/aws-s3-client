@@ -51,6 +51,7 @@ function AppCtrl(s3) {
   }
 
   function init() {
+    console.log('init');
     vm.settings.queryString = "";
     vm.settings.filterSize = "";
     s3.getTotalFilesCount(vm.root).then(count => vm.totalFilesCount = count);

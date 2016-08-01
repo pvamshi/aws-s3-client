@@ -436,6 +436,7 @@ function AppCtrl(s3) {
   }
 
   function init() {
+    console.log('init');
     vm.settings.queryString = "";
     vm.settings.filterSize = "";
     s3.getTotalFilesCount(vm.root).then(function (count) {
@@ -644,8 +645,8 @@ function FileUploadService($q) {
     }));
   }
 
-  function getTotalFilesCount(folder) {
-    var files = getFilesFromStorage(folder);
+  function getTotalFilesCount(folder, forceRefresh) {
+    var files = !forceRefresh && getFilesFromStorage(folder);
     if (files) {
       return $q.when(files.length);
     }
