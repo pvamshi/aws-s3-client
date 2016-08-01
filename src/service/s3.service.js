@@ -8,15 +8,15 @@ function FileUploadService($q) {
   this.getTotalFilesCount = getTotalFilesCount;
   this.getFilesForSettings = getFilesForSettings;
   this.createFolder = createFolder;
-  //===========================================================//
-  AWS.config.update({
-  });
+  this.abortUpload = abortUpload;
+  this.getSettings = getSettings;
+  this.setSettings = setSettings;
 
-  const bucket = new AWS.S3({
-    params: {
-      Bucket: "pvamshi"
-    }
-  });
+  let storedSettings;
+
+  //===========================================================//
+
+  let bucket;
 
   function getFilesForSettings(folder, settings) {
     let files = getFilesFromStorage(folder);
@@ -123,12 +123,18 @@ function FileUploadService($q) {
     }
   }
 
+  let req;
+
   function uploadFile(file) {
     const deferred = $q.defer();
-    bucket.upload(file)
+    req = bucket.putObject(file)
       .on("httpUploadProgress", evt => deferred.notify(getPercent(evt)))
       .send((err, data) => err ? deferred.reject(err) : deferred.resolve(data));
     return deferred.promise;
+  }
+
+  function abortUpload() {
+    req.request.abort();
   }
 
   function createFolder(root, folder) {
@@ -148,4 +154,23 @@ function FileUploadService($q) {
   function getPercent(evt) {
     return parseInt((evt.loaded * 100) / evt.total);
   }
+
+  function getSettings() {
+    return storedSettings;
+  }
+
+  function setSettings(settings) {
+    storedSettings = settings;
+    AWS.config.update({
+      accessKeyId: settings.accessKeyId,
+      secretAccessKey: settings.secretAccessKey
+    });
+    bucket = new AWS.S3({
+      params: {
+        Bucket: "pvamshi"
+      }
+    });
+
+  }
+
 }

@@ -1,15 +1,41 @@
 file-upload-warnings(
-  warnings="vm.invalidFiles"
-  valid-file-length="{{vm.fileUploadStatus.length}}")
+  files="vm.validFiles"
+  valid-file-length="{{vm.validFiles.length}}")
 .content
   file-upload-input(
     set-file-list="vm.setFileList(files)"
     set-invalid-files="vm.setInvalidFiles(files)")
-  p.content(ng-repeat="fileStatus in vm.fileUploadStatus")
-    file-upload-status(file-status='fileStatus')
+  table.table(ng-if="vm.validFiles && vm.validFiles.length>0")
+    thead
+      tr
+        th
+          label.checkbox
+            input(type="checkbox" 
+              ng-model="vm.mainCheckBox"
+              ng-change = "vm.selectAll()")
+        th File
+        th Status
+    tbody
+      tr(ng-repeat="validFile in vm.validFiles")
+        td
+          label.checkbox
+            input(type="checkbox"
+            ng-disabled="!validFile.validity.valid || validFile.uploadDone"
+            ng-model="validFile.selected")
+        td
+          {{validFile.file.name}}
+        td
+          span(ng-show="validFile.percent===0")
+            | Yet to upload
+          span(ng-show="validFile.percent>0 && !validFile.uploadDone")
+            | {{validFile.percent}}% uploaded 
+          span(ng-show="validFile.uploadDone")
+            | Upload done
   p.content
     a.button.is-primary(
       ng-click="vm.uploadAll()"
-      ng-show="vm.fileUploadStatus && vm.fileUploadStatus.length>1"
-      ng-disabled="vm.uploadAllInvalid()"
-      ) Upload All
+      ng-show="vm.validFiles "
+      ng-disabled="!vm.uploadAllValid()"
+      ) Upload
+    a.button.is-danger(ng-click="vm.abort()")
+      | Abort

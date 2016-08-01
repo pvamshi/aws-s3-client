@@ -11,25 +11,18 @@ function FileUploadInput() {
       const fileInput = elem.find('input')[0];
       fileInput.addEventListener('change', () => {
         let files = fileInput.files;
-        let validFilesList = [];
-        let invalidFilesList = [];
+        // let validFilesList = [];
+        let filesList = [];
         for (let i = 0; i < files.length; i++) {
           let file = files[i];
           let fileValidity = validateFile(file);
-          if(fileValidity.valid){
-            validFilesList.push(file);
-          }else{
-            invalidFilesList.push({
-              validity: fileValidity,
-              file: file
-            });
-          }
+          filesList.push({
+            validity: fileValidity,
+            file: file
+          });
         }
         scope.setFileList({
-          files: validFilesList
-        });
-        scope.setInvalidFiles({
-          files: invalidFilesList
+          files: filesList
         });
         scope.$apply();
       });

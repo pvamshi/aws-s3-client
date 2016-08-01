@@ -6,20 +6,33 @@ section.hero.is-info.is-bold
           h2.nav-item AWS S3 Client
         .nav-menu.nav-right
           .nav-item
-            a.has-icon.has-icon-right(ng-click="" ng-href="") Upload
+            a.has-icon.has-icon-right(
+                ng-click="vm.toggleDisplay(true)"
+                ng-href=""
+                ng-class="{'is-active':vm.showUpload}"
+                ) Upload
               span.icon
                 i.fa.fa-cloud-upload
           .nav-item
-            a.has-icon.has-icon-right(ng-click="" ng-href="") 
+            a.has-icon.has-icon-right(
+                ng-click="vm.toggleDisplay(false)"
+                ng-href=""
+                ng-class="{'is-active':vm.showFiles}")
               | File List
               span.icon
                 i.fa.fa-table
+          .nav-item
+            a.has-icon.has-icon-right(
+                ng-click="vm.setShowSettings(true)"
+                ng-href="")
+              | Settings
+              span.icon
+                i.fa.fa-gear
 section.section
   .container
-    files
-.modal(ng-class="{'is-active': vm.showFileUpload}")
-  .modal-background
-  .modal-container
-    .modal-content
-    button.modal-close(ng-click="vm.showFileUpload=false")
+    files(ng-if="vm.showFiles")
+    file-upload(ng-if="vm.showUpload")
+    settings(show-settings="vm.showSettings"
+      set-show-settings = "vm.setShowSettings(showSettings)"
+      )
 

@@ -1,0 +1,27 @@
+.modal(ng-class="{'is-active':vm.showSettings}")
+  .modal-background
+  .modal-container
+    .modal-content
+      .container
+        .box
+          label.label Access Key ID
+          p.control
+            input.input(
+              type="text"
+              ng-model="vm.accessKey"
+              placeholder="Access Key looks like 'AKIAIOSFODNN7EXAMPLE'"
+              )
+          label.label Secret Access Key
+          p.control
+            input.input(
+              type="text"
+              ng-model="vm.secretKey"
+              placeholder="Secret Access Key looks like 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY'"
+              )
+          p.control
+            a.button.is-primary(
+              ng-class="{'is-loading': vm.loading}"
+              ng-disabled="!(vm.accessKey && vm.secretKey)"
+              ng-click="vm.saveSettings()")
+              | Save
+  button.modal-close(ng-click="vm.updateShowSettings(false)")

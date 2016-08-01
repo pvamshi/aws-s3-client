@@ -19,6 +19,6 @@
     "jade": "^1.11.0",
     "lodash": "^4.13.1",
     "node-http-server": "^5.1.0",
-    "shelljs": "^0.7.1"
+    "shelljs": "^0.7.1" 
   }
 }

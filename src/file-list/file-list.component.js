@@ -1,7 +1,5 @@
 angular.module("file-list", [
-    "file-upload.service",
-    "file-list.file-size",
-    "file-list.breadcrumbs"
+    "file-list.file-size"
   ])
   .component("fileList", {
     controller: FileListCtrl,
@@ -15,9 +13,7 @@ angular.module("file-list", [
     templateUrl: "file-list/file-list.template.html"
   });
 
-FileListCtrl.$inject = ["fileUploadService"];
-
-function FileListCtrl(s3) {
+function FileListCtrl() {
   const vm = this;
 
   vm.sortFileByNames = sortFile("name");
