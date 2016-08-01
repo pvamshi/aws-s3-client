@@ -1,4 +1,4 @@
-.content
+.content(ng-show="vm.files")
   .level
     .level-left
       .level-item
@@ -22,13 +22,17 @@ breadcrumbs(
   set-folder="vm.setFolder(folder)"
   root="vm.root")
 
+.content.is-loading(ng-hide="vm.files")
+  p Fetching files ...
+
 file-list(files = "vm.files"
-sort = "vm.settings.sort"
-set-sort-settings = "vm.setSortSettings(sortSettings)"
-set-root-folder = "vm.setRootFolder(root)"
-)
+  sort = "vm.settings.sort"
+  set-sort-settings = "vm.setSortSettings(sortSettings)"
+  set-root-folder = "vm.setRootFolder(root)"
+  )
 
 pagination(
+  ng-show="vm.files"
   total-files-count="vm.totalFilesCount",
   page-size="vm.settings.pageSize"
   update-file-list = "vm.updatePageNumber(pageNumber)"
