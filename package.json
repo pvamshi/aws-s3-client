@@ -17,8 +17,16 @@
     "eslint": "^3.2.0",
     "http-server": "^0.9.0",
     "jade": "^1.11.0",
+    "jasmine": "^2.4.1",
+    "jasmine-core": "^2.4.1",
+    "karma": "^1.1.2",
+    "karma-chrome-launcher": "^1.0.1",
+    "karma-jasmine": "^1.0.2",
+    "karma-ng-html2js-preprocessor": "^1.0.0",
+    "karma-phantomjs-launcher": "^1.0.1",
     "lodash": "^4.13.1",
     "node-http-server": "^5.1.0",
-    "shelljs": "^0.7.1" 
+    "phantomjs-prebuilt": "^2.1.10",
+    "shelljs": "^0.7.1"
   }
 }

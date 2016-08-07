@@ -2,6 +2,40 @@
 (function(){
 "use strict";
 
+angular.module("app", ["file-upload", "files", "settings"]).component("app", {
+  controller: AppCtrl,
+  templateUrl: "app/app.tpl.html",
+  controllerAs: "vm"
+});
+
+function AppCtrl() {
+  var vm = this;
+
+  vm.showSettings = true;
+  vm.showUpload = true;
+  vm.showFiles = false;
+
+  vm.toggleDisplay = toggleDisplay;
+  vm.setShowSettings = setShowSettings;
+
+  function toggleDisplay(upload) {
+    vm.showUpload = upload;
+    vm.showFiles = !upload;
+  }
+
+  function setShowSettings(showSettings) {
+    vm.showSettings = showSettings;
+  }
+}
+
+angular.element(document).ready(function () {
+  angular.bootstrap(document, ["app"]);
+});
+})();
+
+(function(){
+"use strict";
+
 angular.module("breadcrumbs", []).component("breadcrumbs", {
   controller: BreadcrumbsCtrl,
   controllerAs: "vm",
@@ -45,6 +79,54 @@ function BreadcrumbsCtrl() {
 (function(){
 "use strict";
 
+describe("Component: breadcrumbs", function () {
+  var element;
+  var scope;
+  var compile;
+
+  beforeEach(module("breadcrumbs"));
+  beforeEach(module("breadcrumbs/breadcrumbs.tpl.html"));
+  beforeEach(inject(function ($rootScope, $compile) {
+    scope = $rootScope.$new();
+    compile = $compile;
+    scope.vm = {};
+  }));
+
+  it("should display breadcrumbs properly", function () {
+    init("abc/def/ghi");
+    var breadCrumbText = element.find("a");
+    expect(breadCrumbText.length).toBe(3);
+    expect(breadCrumbText[0].text).toBe("abc /");
+    expect(breadCrumbText[1].text).toBe("def /");
+    expect(breadCrumbText[2].text).toBe("ghi /");
+  });
+
+  it("should not display breadcrumbs when root is falsy", function () {
+    init("");
+    var breadCrumbText = element.find("a");
+    expect(breadCrumbText.length).toBe(0);
+  });
+
+  it("should not display breadcrumbs when root is 'root'", function () {
+    init("root");
+    var breadCrumbDiv = element.find("div");
+    expect(breadCrumbDiv.length).toBe(1);
+    expect(breadCrumbDiv[0].className).toBeTruthy();
+    expect(breadCrumbDiv[0].className.split(' ')).toContain('ng-hide');
+  });
+
+  function init(root) {
+    scope.vm.setFolder = function (folder) {};
+    element = compile(angular.element("<breadcrumbs root='vm.root' set-folder = 'vm.setFolder(folder)' ><breadcrumbs>"))(scope);
+    scope.vm.root = root;
+    scope.$apply();
+  }
+});
+})();
+
+(function(){
+"use strict";
+
 angular.module("create-folder", ["s3"]).component("createFolder", {
   controller: CreateFolderCtrl,
   controllerAs: "vm",
@@ -80,128 +162,6 @@ function CreateFolderCtrl(s3) {
     s3.createFolder(vm.root, vm.folderName).then(function (files) {
       return console.info("uploaded files" + files);
     });
-  }
-}
-})();
-
-(function(){
-"use strict";
-
-angular.module("app", ["file-upload", "files", "settings"]).component("app", {
-  controller: AppCtrl,
-  templateUrl: "app/app.tpl.html",
-  controllerAs: "vm"
-});
-
-function AppCtrl() {
-  var vm = this;
-
-  vm.showSettings = true;
-  vm.showUpload = true;
-  vm.showFiles = false;
-
-  vm.toggleDisplay = toggleDisplay;
-  vm.setShowSettings = setShowSettings;
-
-  function toggleDisplay(upload) {
-    vm.showUpload = upload;
-    vm.showFiles = !upload;
-  }
-
-  function setShowSettings(showSettings) {
-    vm.showSettings = showSettings;
-  }
-}
-
-angular.element(document).ready(function () {
-  angular.bootstrap(document, ["app"]);
-});
-})();
-
-(function(){
-"use strict";
-
-angular.module("files", ["file-upload", "file-list", "page-size", "breadcrumbs", "pagination", "create-folder", "filter-size", "s3"]).component("files", {
-  controller: AppCtrl,
-  templateUrl: "files/files.tpl.html",
-  controllerAs: "vm"
-});
-
-AppCtrl.$inject = ["s3Service"];
-
-function AppCtrl(s3) {
-  var vm = this;
-
-  vm.$onInit = init;
-  vm.setPageSize = setPageSize;
-  vm.setFolder = setFolder;
-  vm.updatePageNumber = updatePageNumber;
-  vm.fetchFiles = fetchFiles;
-  vm.setSortSettings = setSortSettings;
-  vm.setRootFolder = setRootFolder;
-  vm.setSizeFilter = setSizeFilter;
-  vm.settings = {};
-  vm.totalFilesCount = 0;
-  vm.settings.sort = {};
-  vm.settings.filter = {};
-  vm.settings.filter.name = "";
-  vm.settings.filter.size = {
-    min: "",
-    minTimes: 1,
-    max: "",
-    maxTimes: 1
-  };
-
-  vm.root = "root";
-
-  function setPageSize(pageSize) {
-    vm.settings.pageSize = pageSize;
-  }
-
-  function setFoler(folder) {
-    vm.root = folder;
-  }
-
-  function init() {
-    console.log('init');
-    vm.settings.queryString = "";
-    vm.settings.filterSize = "";
-    s3.getTotalFilesCount(vm.root).then(function (count) {
-      return vm.totalFilesCount = count;
-    });
-  }
-
-  function updatePageNumber(pageNumber) {
-    vm.settings.pageNumber = pageNumber;
-    fetchFiles();
-  }
-
-  function fetchFiles() {
-    s3.getFilesForSettings(vm.root, vm.settings).then(function (files) {
-      return vm.files = files;
-    }).catch(function (err) {
-      return console.log(err);
-    });
-  }
-
-  function setFolder(folder) {
-    vm.root = folder;
-    init();
-  }
-
-  function setSortSettings(sortSettings) {
-    vm.settings.sort = sortSettings;
-    fetchFiles();
-  }
-
-  function setRootFolder(root) {
-    vm.root = root;
-    init();
-  }
-
-  function setSizeFilter(filterSettings) {
-    vm.settings.filter.size = filterSettings;
-    fetchFiles();
   }
 }
 })();
@@ -266,6 +226,111 @@ function fileSize() {
       return sizeInBytes + ' B';
     }
   };
+}
+})();
+
+(function(){
+'use strict';
+
+angular.module('file-upload.file-upload-input', []).directive('fileUploadInput', FileUploadInput);
+
+function FileUploadInput() {
+  var directive = {
+    scope: {
+      setFileList: '&',
+      setInvalidFiles: '&'
+    },
+    link: function link(scope, elem) {
+      var fileInput = elem.find('input')[0];
+      fileInput.addEventListener('change', function () {
+        var files = fileInput.files;
+        // let validFilesList = [];
+        var filesList = [];
+        for (var i = 0; i < files.length; i++) {
+          var file = files[i];
+          var fileValidity = validateFile(file);
+          filesList.push({
+            validity: fileValidity,
+            file: file
+          });
+        }
+        scope.setFileList({
+          files: filesList
+        });
+        scope.$apply();
+      });
+
+      function validateFile(file) {
+        var fileValidity = {
+          valid: true,
+          reason: ''
+        };
+        // if (file.type !== 'text/csv' && file.type !== 'application/vnd.ms-excel') {
+        if (!(/.*\.csv$/.test(file.name) || /.*\.xls$/.test(file.name))) {
+          fileValidity.valid = false;
+          fileValidity.reason = "File type need to be either .csv or .xls";
+          return fileValidity;
+        }
+        if (file.size === 0) {
+          fileValidity.valid = false;
+          fileValidity.reason = "File size cannot be 0";
+          return fileValidity;
+        }
+        if (file.size > 10000000) {
+          fileValidity.valid = false;
+          fileValidity.reason = "File size cannot exceed 10MB";
+        }
+        return fileValidity;
+      }
+    },
+    templateUrl: 'file-upload/file-upload-input/file-upload-input.template.html'
+  };
+  return directive;
+}
+})();
+
+(function(){
+'use strict';
+
+angular.module('file-upload.file-upload-status', []).component('fileUploadStatus', {
+  controller: FileUploadStatus,
+  controllerAs: 'vm',
+  bindings: {
+    fileStatus: '<'
+  },
+  templateUrl: 'file-upload/file-upload-status/file-upload-status.template.html'
+});
+
+function FileUploadStatus() {}
+})();
+
+(function(){
+'use strict';
+
+angular.module('file-upload.file-upload-warnings', []).component('fileUploadWarnings', {
+  controller: FileUploadWarning,
+  controllerAs: 'vm',
+  bindings: {
+    files: '<',
+    validFileLength: '@'
+  },
+  templateUrl: 'file-upload/file-upload-warnings/file-upload-warnings.template.html'
+});
+
+function FileUploadWarning() {
+  var vm = this;
+
+  vm.$onInit = vm.$onChanges = init;
+
+  function init() {
+    vm.invalidFiles = vm.files.filter(function (file) {
+      return !file.validity.valid;
+    });
+    vm.showError = vm.invalidFiles.length === vm.files.length;
+    //TODO: bug: Closing window hides the error page even for next iteration
+
+    vm.showDialog = true;
+  }
 }
 })();
 
@@ -370,6 +435,94 @@ function FileUploadCtrl(fileUploadService) {
 
   function abort() {
     fileUploadService.abortUpload();
+  }
+}
+})();
+
+(function(){
+"use strict";
+
+angular.module("files", ["file-upload", "file-list", "page-size", "breadcrumbs", "pagination", "create-folder", "filter-size", "s3"]).component("files", {
+  controller: AppCtrl,
+  templateUrl: "files/files.tpl.html",
+  controllerAs: "vm"
+});
+
+AppCtrl.$inject = ["s3Service"];
+
+function AppCtrl(s3) {
+  var vm = this;
+
+  vm.$onInit = init;
+  vm.setPageSize = setPageSize;
+  vm.setFolder = setFolder;
+  vm.updatePageNumber = updatePageNumber;
+  vm.fetchFiles = fetchFiles;
+  vm.setSortSettings = setSortSettings;
+  vm.setRootFolder = setRootFolder;
+  vm.setSizeFilter = setSizeFilter;
+  vm.settings = {};
+  vm.totalFilesCount = 0;
+  vm.settings.sort = {};
+  vm.settings.filter = {};
+  vm.settings.filter.name = "";
+  vm.settings.filter.size = {
+    min: "",
+    minTimes: 1,
+    max: "",
+    maxTimes: 1
+  };
+
+  vm.root = "root";
+
+  function setPageSize(pageSize) {
+    vm.settings.pageSize = pageSize;
+  }
+
+  function setFoler(folder) {
+    vm.root = folder;
+  }
+
+  function init() {
+    console.log('init');
+    vm.settings.queryString = "";
+    vm.settings.filterSize = "";
+    s3.getTotalFilesCount(vm.root).then(function (count) {
+      return vm.totalFilesCount = count;
+    });
+  }
+
+  function updatePageNumber(pageNumber) {
+    vm.settings.pageNumber = pageNumber;
+    fetchFiles();
+  }
+
+  function fetchFiles() {
+    s3.getFilesForSettings(vm.root, vm.settings).then(function (files) {
+      return vm.files = files;
+    }).catch(function (err) {
+      return console.log(err);
+    });
+  }
+
+  function setFolder(folder) {
+    vm.root = folder;
+    init();
+  }
+
+  function setSortSettings(sortSettings) {
+    vm.settings.sort = sortSettings;
+    fetchFiles();
+  }
+
+  function setRootFolder(root) {
+    vm.root = root;
+    init();
+  }
+
+  function setSizeFilter(filterSettings) {
+    vm.settings.filter.size = filterSettings;
+    fetchFiles();
   }
 }
 })();
@@ -764,110 +917,5 @@ function SettingsCtrl(s3) {
       bucket: vm.bucket
     });
   }
-}
-})();
-
-(function(){
-'use strict';
-
-angular.module('file-upload.file-upload-status', []).component('fileUploadStatus', {
-  controller: FileUploadStatus,
-  controllerAs: 'vm',
-  bindings: {
-    fileStatus: '<'
-  },
-  templateUrl: 'file-upload/file-upload-status/file-upload-status.template.html'
-});
-
-function FileUploadStatus() {}
-})();
-
-(function(){
-'use strict';
-
-angular.module('file-upload.file-upload-warnings', []).component('fileUploadWarnings', {
-  controller: FileUploadWarning,
-  controllerAs: 'vm',
-  bindings: {
-    files: '<',
-    validFileLength: '@'
-  },
-  templateUrl: 'file-upload/file-upload-warnings/file-upload-warnings.template.html'
-});
-
-function FileUploadWarning() {
-  var vm = this;
-
-  vm.$onInit = vm.$onChanges = init;
-
-  function init() {
-    vm.invalidFiles = vm.files.filter(function (file) {
-      return !file.validity.valid;
-    });
-    vm.showError = vm.invalidFiles.length === vm.files.length;
-    //TODO: bug: Closing window hides the error page even for next iteration
-
-    vm.showDialog = true;
-  }
-}
-})();
-
-(function(){
-'use strict';
-
-angular.module('file-upload.file-upload-input', []).directive('fileUploadInput', FileUploadInput);
-
-function FileUploadInput() {
-  var directive = {
-    scope: {
-      setFileList: '&',
-      setInvalidFiles: '&'
-    },
-    link: function link(scope, elem) {
-      var fileInput = elem.find('input')[0];
-      fileInput.addEventListener('change', function () {
-        var files = fileInput.files;
-        // let validFilesList = [];
-        var filesList = [];
-        for (var i = 0; i < files.length; i++) {
-          var file = files[i];
-          var fileValidity = validateFile(file);
-          filesList.push({
-            validity: fileValidity,
-            file: file
-          });
-        }
-        scope.setFileList({
-          files: filesList
-        });
-        scope.$apply();
-      });
-
-      function validateFile(file) {
-        var fileValidity = {
-          valid: true,
-          reason: ''
-        };
-        // if (file.type !== 'text/csv' && file.type !== 'application/vnd.ms-excel') {
-        if (!(/.*\.csv$/.test(file.name) || /.*\.xls$/.test(file.name))) {
-          fileValidity.valid = false;
-          fileValidity.reason = "File type need to be either .csv or .xls";
-          return fileValidity;
-        }
-        if (file.size === 0) {
-          fileValidity.valid = false;
-          fileValidity.reason = "File size cannot be 0";
-          return fileValidity;
-        }
-        if (file.size > 10000000) {
-          fileValidity.valid = false;
-          fileValidity.reason = "File size cannot exceed 10MB";
-        }
-        return fileValidity;
-      }
-    },
-    templateUrl: 'file-upload/file-upload-input/file-upload-input.template.html'
-  };
-  return directive;
 }
 })();
