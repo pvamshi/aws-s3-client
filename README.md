@@ -2,7 +2,7 @@
 Web based client for AWS S3
 
 #Preview 
-The site can be viewed as http://vamshi-krishna.com/aws-s3-client/build
+The site can be viewed at http://vamshi-krishna.com/aws-s3-client/build
 
 #Steps to build locally 
 1. `npm install`
