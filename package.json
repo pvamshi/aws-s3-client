@@ -4,9 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prestart": "node index.js",
-    "start": "./node_modules/http-server/bin/http-server build"
+    "test": "karma start karma.conf.js",
+    "start": "node index.js"
   },
   "author": "",
   "license": "ISC",
