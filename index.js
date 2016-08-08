@@ -9,7 +9,7 @@ const presets = {
   presets: ['es2015']
 };
 
-watch('./src/**/*.js')
+watch('./src/**/*[^spec].js')
   .on('add', (path) => {
     console.log('file added to watch ' + path);
     let code = cat(path);

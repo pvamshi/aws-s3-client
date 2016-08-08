@@ -2,40 +2,6 @@
 (function(){
 "use strict";
 
-angular.module("app", ["file-upload", "files", "settings"]).component("app", {
-  controller: AppCtrl,
-  templateUrl: "app/app.tpl.html",
-  controllerAs: "vm"
-});
-
-function AppCtrl() {
-  var vm = this;
-
-  vm.showSettings = true;
-  vm.showUpload = true;
-  vm.showFiles = false;
-
-  vm.toggleDisplay = toggleDisplay;
-  vm.setShowSettings = setShowSettings;
-
-  function toggleDisplay(upload) {
-    vm.showUpload = upload;
-    vm.showFiles = !upload;
-  }
-
-  function setShowSettings(showSettings) {
-    vm.showSettings = showSettings;
-  }
-}
-
-angular.element(document).ready(function () {
-  angular.bootstrap(document, ["app"]);
-});
-})();
-
-(function(){
-"use strict";
-
 angular.module("breadcrumbs", []).component("breadcrumbs", {
   controller: BreadcrumbsCtrl,
   controllerAs: "vm",
@@ -79,91 +45,35 @@ function BreadcrumbsCtrl() {
 (function(){
 "use strict";
 
-describe("Component: breadcrumbs", function () {
-  var element;
-  var scope;
-  var compile;
-
-  beforeEach(module("breadcrumbs"));
-  beforeEach(module("breadcrumbs/breadcrumbs.tpl.html"));
-  beforeEach(inject(function ($rootScope, $compile) {
-    scope = $rootScope.$new();
-    compile = $compile;
-    scope.vm = {};
-  }));
-
-  it("should display breadcrumbs properly", function () {
-    init("abc/def/ghi");
-    var breadCrumbText = element.find("a");
-    expect(breadCrumbText.length).toBe(3);
-    expect(breadCrumbText[0].text).toBe("abc /");
-    expect(breadCrumbText[1].text).toBe("def /");
-    expect(breadCrumbText[2].text).toBe("ghi /");
-  });
-
-  it("should not display breadcrumbs when root is falsy", function () {
-    init("");
-    var breadCrumbText = element.find("a");
-    expect(breadCrumbText.length).toBe(0);
-  });
-
-  it("should not display breadcrumbs when root is 'root'", function () {
-    init("root");
-    var breadCrumbDiv = element.find("div");
-    expect(breadCrumbDiv.length).toBe(1);
-    expect(breadCrumbDiv[0].className).toBeTruthy();
-    expect(breadCrumbDiv[0].className.split(' ')).toContain('ng-hide');
-  });
-
-  function init(root) {
-    scope.vm.setFolder = function (folder) {};
-    element = compile(angular.element("<breadcrumbs root='vm.root' set-folder = 'vm.setFolder(folder)' ><breadcrumbs>"))(scope);
-    scope.vm.root = root;
-    scope.$apply();
-  }
-});
-})();
-
-(function(){
-"use strict";
-
-angular.module("create-folder", ["s3"]).component("createFolder", {
-  controller: CreateFolderCtrl,
-  controllerAs: "vm",
-  bindings: {
-    root: "<"
-  },
-  templateUrl: "create-folder/create-folder.tpl.html"
+angular.module("app", ["file-upload", "files", "settings"]).component("app", {
+  controller: AppCtrl,
+  templateUrl: "app/app.tpl.html",
+  controllerAs: "vm"
 });
 
-CreateFolderCtrl.$inject = ["s3Service"];
-
-function CreateFolderCtrl(s3) {
+function AppCtrl() {
   var vm = this;
 
-  vm.folderExists = false;
-  vm.folderName = "";
+  vm.showSettings = true;
+  vm.showUpload = true;
+  vm.showFiles = false;
 
-  vm.checkFolder = checkFolder;
-  vm.createFolder = createFolder;
+  vm.toggleDisplay = toggleDisplay;
+  vm.setShowSettings = setShowSettings;
 
-  function checkFolder() {
-    var settings = {
-      pageNumber: 1,
-      pageSize: 5,
-      queryString: "^" + vm.folderName + "$"
-    };
-    s3.getFilesForSettings(vm.root, settings).then(function (files) {
-      return vm.folderExists = files.length > 0;
-    });
+  function toggleDisplay(upload) {
+    vm.showUpload = upload;
+    vm.showFiles = !upload;
   }
 
-  function createFolder() {
-    s3.createFolder(vm.root, vm.folderName).then(function (files) {
-      return console.info("uploaded files" + files);
-    });
+  function setShowSettings(showSettings) {
+    vm.showSettings = showSettings;
   }
 }
+
+angular.element(document).ready(function () {
+  angular.bootstrap(document, ["app"]);
+});
 })();
 
 (function(){
@@ -230,106 +140,43 @@ function fileSize() {
 })();
 
 (function(){
-'use strict';
+"use strict";
 
-angular.module('file-upload.file-upload-input', []).directive('fileUploadInput', FileUploadInput);
-
-function FileUploadInput() {
-  var directive = {
-    scope: {
-      setFileList: '&',
-      setInvalidFiles: '&'
-    },
-    link: function link(scope, elem) {
-      var fileInput = elem.find('input')[0];
-      fileInput.addEventListener('change', function () {
-        var files = fileInput.files;
-        // let validFilesList = [];
-        var filesList = [];
-        for (var i = 0; i < files.length; i++) {
-          var file = files[i];
-          var fileValidity = validateFile(file);
-          filesList.push({
-            validity: fileValidity,
-            file: file
-          });
-        }
-        scope.setFileList({
-          files: filesList
-        });
-        scope.$apply();
-      });
-
-      function validateFile(file) {
-        var fileValidity = {
-          valid: true,
-          reason: ''
-        };
-        // if (file.type !== 'text/csv' && file.type !== 'application/vnd.ms-excel') {
-        if (!(/.*\.csv$/.test(file.name) || /.*\.xls$/.test(file.name))) {
-          fileValidity.valid = false;
-          fileValidity.reason = "File type need to be either .csv or .xls";
-          return fileValidity;
-        }
-        if (file.size === 0) {
-          fileValidity.valid = false;
-          fileValidity.reason = "File size cannot be 0";
-          return fileValidity;
-        }
-        if (file.size > 10000000) {
-          fileValidity.valid = false;
-          fileValidity.reason = "File size cannot exceed 10MB";
-        }
-        return fileValidity;
-      }
-    },
-    templateUrl: 'file-upload/file-upload-input/file-upload-input.template.html'
-  };
-  return directive;
-}
-})();
-
-(function(){
-'use strict';
-
-angular.module('file-upload.file-upload-status', []).component('fileUploadStatus', {
-  controller: FileUploadStatus,
-  controllerAs: 'vm',
+angular.module("create-folder", ["s3"]).component("createFolder", {
+  controller: CreateFolderCtrl,
+  controllerAs: "vm",
   bindings: {
-    fileStatus: '<'
+    root: "<"
   },
-  templateUrl: 'file-upload/file-upload-status/file-upload-status.template.html'
+  templateUrl: "create-folder/create-folder.tpl.html"
 });
 
-function FileUploadStatus() {}
-})();
+CreateFolderCtrl.$inject = ["s3Service"];
 
-(function(){
-'use strict';
-
-angular.module('file-upload.file-upload-warnings', []).component('fileUploadWarnings', {
-  controller: FileUploadWarning,
-  controllerAs: 'vm',
-  bindings: {
-    files: '<',
-    validFileLength: '@'
-  },
-  templateUrl: 'file-upload/file-upload-warnings/file-upload-warnings.template.html'
-});
-
-function FileUploadWarning() {
+function CreateFolderCtrl(s3) {
   var vm = this;
 
-  vm.$onInit = vm.$onChanges = init;
+  vm.folderExists = false;
+  vm.folderName = "";
 
-  function init() {
-    vm.invalidFiles = vm.files.filter(function (file) {
-      return !file.validity.valid;
+  vm.checkFolder = checkFolder;
+  vm.createFolder = createFolder;
+
+  function checkFolder() {
+    var settings = {
+      pageNumber: 1,
+      pageSize: 5,
+      queryString: "^" + vm.folderName + "$"
+    };
+    s3.getFilesForSettings(vm.root, settings).then(function (files) {
+      return vm.folderExists = files.length > 0;
     });
-    vm.showError = vm.invalidFiles.length === vm.files.length;
-    //TODO: bug: Closing window hides the error page even for next iteration
+  }
 
-    vm.showDialog = true;
+  function createFolder() {
+    s3.createFolder(vm.root, vm.folderName).then(function (files) {
+      return console.info("uploaded files" + files);
+    });
   }
 }
 })();
@@ -484,7 +331,6 @@ function AppCtrl(s3) {
   }
 
   function init() {
-    console.log('init');
     vm.settings.queryString = "";
     vm.settings.filterSize = "";
     s3.getTotalFilesCount(vm.root).then(function (count) {
@@ -655,214 +501,6 @@ function PaginationCtrl() {
 (function(){
 "use strict";
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-angular.module("s3", []).service("s3Service", FileUploadService);
-
-FileUploadService.$inject = ["$q"];
-
-function FileUploadService($q) {
-  this.uploadFile = uploadFile;
-  this.getTotalFilesCount = getTotalFilesCount;
-  this.getFilesForSettings = getFilesForSettings;
-  this.createFolder = createFolder;
-  this.abortUpload = abortUpload;
-  this.getSettings = getSettings;
-  this.setSettings = setSettings;
-  this.testSettings = testSettings;
-
-  var storedSettings = void 0;
-
-  //===========================================================//
-
-  var bucket = void 0;
-
-  function getFilesForSettings(folder, settings) {
-    var files = getFilesFromStorage(folder);
-    files = filterFiles(files, settings.filter);
-    files = sort(files, settings.sort);
-    return $q.when(files.splice(settings.pageSize * (settings.pageNumber - 1), settings.pageSize));
-  }
-
-  function sort(files, sortSettings) {
-    if (!sortSettings) {
-      return files;
-    }
-    return _.orderBy(files, _.keys(sortSettings), _.keys(sortSettings).map(function (k) {
-      return sortSettings[k];
-    }));
-  }
-
-  function getTotalFilesCount(folder) {
-    // const files =!forceRefresh &&  getFilesFromStorage(folder);
-    // if (files) {
-    //   return $q.when(files.length);
-    // }
-    return fetchFiles().then(function (response) {
-      return response && response.files && response.files.length;
-    });
-  }
-
-  function getFilesFromStorage(folder) {
-    var storageFileJsonStr = sessionStorage.getItem(folder || "root");
-    try {
-      return JSON.parse(storageFileJsonStr);
-    } catch (e) {
-      console.error("error while parsing storage json");
-    }
-    return;
-  }
-
-  function filterFiles(files, filterSettings) {
-    if (filterSettings && filterSettings.name && files) {
-      (function () {
-        var regex = new RegExp(filterSettings.name.replace(/\./g, "\\.").replace(/\*/g, ".*"));
-        files = files.filter(function (file) {
-          return regex.test(file.name);
-        });
-      })();
-    }
-    if (filterSettings && files && filterSettings.size) {
-      if (filterSettings.size.min && filterSettings.size.min > 0) {
-        files = files.filter(function (file) {
-          return file.size > filterSettings.size.min * filterSettings.size.minTimes;
-        });
-      }
-      if (filterSettings.size.max && filterSettings.size.max > 0) {
-        files = files.filter(function (file) {
-          return file.size < filterSettings.size.max * filterSettings.size.maxTimes;
-        });
-      }
-    }
-    return files;
-  }
-
-  function fetchFiles() {
-
-    var deferred = $q.defer();
-    bucket.listObjects(function (err, data) {
-      if (err) {
-        deferred.reject(err);
-      } else {
-        if (data && data.Contents) {
-          saveFiles(data.Contents);
-          deferred.resolve({
-            files: JSON.parse(sessionStorage.getItem("root")),
-            meta: {}
-          });
-        } else {
-          //TODO: Send proper error
-          deferred.reject("no content in data");
-        }
-      }
-    });
-    return deferred.promise;
-  }
-
-  function saveFiles(files) {
-    _.chain(files).map(function (file) {
-      return getFile(file);
-    }).reduce(mapFiles, {}).forOwn(function (fileArr, parent) {
-      return sessionStorage.setItem(parent, JSON.stringify(fileArr));
-    }).value();
-  }
-
-  function mapFiles(dataObj, file) {
-    dataObj[file.folderPath] = dataObj[file.folderPath] || [];
-    dataObj[file.folderPath].push(file);
-    return dataObj;
-  }
-
-  function getFile(file) {
-    var folder = false;
-    var keySplit = file.Key.split("/");
-    var fileName = keySplit.pop();
-    if (fileName == "") {
-      folder = true;
-      fileName = keySplit.pop();
-    }
-    var parent = "root" + (keySplit.length > 0 ? "/" + keySplit.join("/") : "");
-    return new File(folder, parent, fileName, file.LastModified, file.Size);
-  }
-
-  var File = function File(folder, folderPath, name, lastModified, size) {
-    _classCallCheck(this, File);
-
-    this.folder = folder;
-    this.folderPath = folderPath;
-    this.name = name;
-    this.lastModified = new Date(lastModified).getTime();
-    this.size = size;
-  };
-
-  var req = void 0;
-
-  function uploadFile(file) {
-    var deferred = $q.defer();
-    req = bucket.putObject(file).on("httpUploadProgress", function (evt) {
-      return deferred.notify(getPercent(evt));
-    }).send(function (err, data) {
-      return err ? deferred.reject(err) : deferred.resolve(data);
-    });
-    return deferred.promise;
-  }
-
-  function abortUpload() {
-    req.request.abort();
-  }
-
-  function createFolder(root, folder) {
-    var folderKey = "";
-    if (root && root !== "root") {
-      folderKey = root + "/" + folder + "/";
-    } else {
-      folderKey = "pvamshi/" + folder + "/";
-    }
-    bucket.createBucket({
-      Bucket: folderKey
-    }, function (err, data) {
-      console.log("bucket creation: " + err ? "FAIL" : "SUCCESS");
-    });
-  }
-
-  function getPercent(evt) {
-    return parseInt(evt.loaded * 100 / evt.total);
-  }
-
-  function getSettings() {
-    return storedSettings;
-  }
-
-  function setSettings(settings) {
-    storedSettings = settings;
-    AWS.config.update({
-      accessKeyId: settings.accessKeyId,
-      secretAccessKey: settings.secretAccessKey
-    });
-    bucket = new AWS.S3({
-      params: {
-        Bucket: settings.bucket
-      }
-    });
-  }
-
-  function testSettings(settings) {
-    AWS.config.update({
-      accessKeyId: settings.accessKeyId,
-      secretAccessKey: settings.secretAccessKey
-    });
-    var s3 = new AWS.S3({
-      params: {
-        Bucket: settings.bucket
-      }
-    });
-  }
-}
-})();
-
-(function(){
-"use strict";
-
 angular.module("settings", ["s3"]).component("settings", {
   controller: SettingsCtrl,
   controllerAs: "vm",
@@ -918,4 +556,19 @@ function SettingsCtrl(s3) {
     });
   }
 }
+})();
+
+(function(){
+'use strict';
+
+angular.module('file-upload.file-upload-status', []).component('fileUploadStatus', {
+  controller: FileUploadStatus,
+  controllerAs: 'vm',
+  bindings: {
+    fileStatus: '<'
+  },
+  templateUrl: 'file-upload/file-upload-status/file-upload-status.template.html'
+});
+
+function FileUploadStatus() {}
 })();
