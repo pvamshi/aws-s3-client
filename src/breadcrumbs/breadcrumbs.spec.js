@@ -10,7 +10,6 @@ describe("Component: breadcrumbs",function(){
     var bindings = {root:'abc/def/ghi', setFolder:function(){}};
     var vm = $componentController('breadcrumbs',null,bindings);
     vm.$onInit();
-    console.log(vm.breadCrumbs);
     expect(vm.breadCrumbs.length).toBe(3);
     expect(vm.breadCrumbs).toEqual([['abc','abc'],['def','abc/def'],['ghi','abc/def/ghi']]);
   });
@@ -18,7 +17,6 @@ describe("Component: breadcrumbs",function(){
     var bindings = {root:'abc', setFolder:function(){}};
     var vm = $componentController('breadcrumbs',null,bindings);
     vm.$onInit();
-    console.log(vm.breadCrumbs);
     expect(vm.breadCrumbs.length).toBe(1);
     expect(vm.breadCrumbs).toEqual([['abc','abc']]);
   });
@@ -44,7 +42,6 @@ describe("Component: breadcrumbs : html", function() {
     expect(breadCrumbText[0].text).toBe("abc /");
     expect(breadCrumbText[1].text).toBe("def /");
     expect(breadCrumbText[2].text).toBe("ghi /");
-    console.log(element.scope().vm);
   });
 
   it("should not display breadcrumbs when root is falsy", function() {

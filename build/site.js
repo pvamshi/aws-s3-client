@@ -2,6 +2,40 @@
 (function(){
 "use strict";
 
+angular.module("app", ["file-upload", "files", "settings"]).component("app", {
+  controller: AppCtrl,
+  templateUrl: "app/app.tpl.html",
+  controllerAs: "vm"
+});
+
+function AppCtrl() {
+  var vm = this;
+
+  vm.showSettings = true;
+  vm.showUpload = true;
+  vm.showFiles = false;
+
+  vm.toggleDisplay = toggleDisplay;
+  vm.setShowSettings = setShowSettings;
+
+  function toggleDisplay(upload) {
+    vm.showUpload = upload;
+    vm.showFiles = !upload;
+  }
+
+  function setShowSettings(showSettings) {
+    vm.showSettings = showSettings;
+  }
+}
+
+angular.element(document).ready(function () {
+  angular.bootstrap(document, ["app"]);
+});
+})();
+
+(function(){
+"use strict";
+
 angular.module("breadcrumbs", []).component("breadcrumbs", {
   controller: BreadcrumbsCtrl,
   controllerAs: "vm",
@@ -45,35 +79,43 @@ function BreadcrumbsCtrl() {
 (function(){
 "use strict";
 
-angular.module("app", ["file-upload", "files", "settings"]).component("app", {
-  controller: AppCtrl,
-  templateUrl: "app/app.tpl.html",
-  controllerAs: "vm"
+angular.module("create-folder", ["s3"]).component("createFolder", {
+  controller: CreateFolderCtrl,
+  controllerAs: "vm",
+  bindings: {
+    root: "<"
+  },
+  templateUrl: "create-folder/create-folder.tpl.html"
 });
 
-function AppCtrl() {
+CreateFolderCtrl.$inject = ["s3Service"];
+
+function CreateFolderCtrl(s3) {
   var vm = this;
 
-  vm.showSettings = true;
-  vm.showUpload = true;
-  vm.showFiles = false;
+  vm.folderExists = false;
+  vm.folderName = "";
 
-  vm.toggleDisplay = toggleDisplay;
-  vm.setShowSettings = setShowSettings;
+  vm.checkFolder = checkFolder;
+  vm.createFolder = createFolder;
 
-  function toggleDisplay(upload) {
-    vm.showUpload = upload;
-    vm.showFiles = !upload;
+  function checkFolder() {
+    var settings = {
+      pageNumber: 1,
+      pageSize: 5,
+      queryString: "^" + vm.folderName + "$"
+    };
+    s3.getFilesForSettings(vm.root, settings).then(function (files) {
+      return vm.folderExists = files.length > 0;
+    });
   }
 
-  function setShowSettings(showSettings) {
-    vm.showSettings = showSettings;
+  function createFolder() {
+    s3.createFolder(vm.root, vm.folderName).then(function (files) {
+      return console.info("uploaded files" + files);
+    });
   }
 }
-
-angular.element(document).ready(function () {
-  angular.bootstrap(document, ["app"]);
-});
 })();
 
 (function(){
@@ -140,45 +182,18 @@ function fileSize() {
 })();
 
 (function(){
-"use strict";
+'use strict';
 
-angular.module("create-folder", ["s3"]).component("createFolder", {
-  controller: CreateFolderCtrl,
-  controllerAs: "vm",
+angular.module('file-upload.file-upload-status', []).component('fileUploadStatus', {
+  controller: FileUploadStatus,
+  controllerAs: 'vm',
   bindings: {
-    root: "<"
+    fileStatus: '<'
   },
-  templateUrl: "create-folder/create-folder.tpl.html"
+  templateUrl: 'file-upload/file-upload-status/file-upload-status.template.html'
 });
 
-CreateFolderCtrl.$inject = ["s3Service"];
-
-function CreateFolderCtrl(s3) {
-  var vm = this;
-
-  vm.folderExists = false;
-  vm.folderName = "";
-
-  vm.checkFolder = checkFolder;
-  vm.createFolder = createFolder;
-
-  function checkFolder() {
-    var settings = {
-      pageNumber: 1,
-      pageSize: 5,
-      queryString: "^" + vm.folderName + "$"
-    };
-    s3.getFilesForSettings(vm.root, settings).then(function (files) {
-      return vm.folderExists = files.length > 0;
-    });
-  }
-
-  function createFolder() {
-    s3.createFolder(vm.root, vm.folderName).then(function (files) {
-      return console.info("uploaded files" + files);
-    });
-  }
-}
+function FileUploadStatus() {}
 })();
 
 (function(){
@@ -331,6 +346,7 @@ function AppCtrl(s3) {
   }
 
   function init() {
+    console.log('init');
     vm.settings.queryString = "";
     vm.settings.filterSize = "";
     s3.getTotalFilesCount(vm.root).then(function (count) {
@@ -556,19 +572,4 @@ function SettingsCtrl(s3) {
     });
   }
 }
-})();
-
-(function(){
-'use strict';
-
-angular.module('file-upload.file-upload-status', []).component('fileUploadStatus', {
-  controller: FileUploadStatus,
-  controllerAs: 'vm',
-  bindings: {
-    fileStatus: '<'
-  },
-  templateUrl: 'file-upload/file-upload-status/file-upload-status.template.html'
-});
-
-function FileUploadStatus() {}
 })();
