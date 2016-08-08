@@ -9,6 +9,12 @@ const presets = {
   presets: ['es2015']
 };
 
+rm('-rf','./temp/**');
+mkdir('./build');
+''.to('./build/site.js');
+''.to('./build/external.js');
+''.to('./build/external.css');
+
 watch('./src/**/*[^spec].js')
   .on('add', (path) => {
     console.log('file added to watch ' + path);
@@ -41,8 +47,6 @@ watch('./src/**/*.jade')
     jade.renderFile(path).to(destinyFile);
   })
 
-mkdir('./build');
-''.to('./build/site.js');
 
 watch('./temp/**/*.js')
   .on('add', (path) => {
@@ -52,14 +56,12 @@ watch('./temp/**/*.js')
     cat('./temp/**/*.js').to('./build/site.js'); //override whole file
   });
 
-''.to('./build/external.js');
 [
   "bower_components/angular/angular.min.js",
   "bower_components/aws-sdk/dist/aws-sdk.min.js",
   "bower_components/lodash/dist/lodash.min.js"
 ].forEach(file => cat(file).toEnd('./build/external.js'));
 
-''.to('./build/external.css');
 [
   'bower_components/bulma/css/bulma.css',
   'bower_components/font-awesome/css/font-awesome.min.css'

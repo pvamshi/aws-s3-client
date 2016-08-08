@@ -2,40 +2,6 @@
 (function(){
 "use strict";
 
-angular.module("app", ["file-upload", "files", "settings"]).component("app", {
-  controller: AppCtrl,
-  templateUrl: "app/app.tpl.html",
-  controllerAs: "vm"
-});
-
-function AppCtrl() {
-  var vm = this;
-
-  vm.showSettings = true;
-  vm.showUpload = true;
-  vm.showFiles = false;
-
-  vm.toggleDisplay = toggleDisplay;
-  vm.setShowSettings = setShowSettings;
-
-  function toggleDisplay(upload) {
-    vm.showUpload = upload;
-    vm.showFiles = !upload;
-  }
-
-  function setShowSettings(showSettings) {
-    vm.showSettings = showSettings;
-  }
-}
-
-angular.element(document).ready(function () {
-  angular.bootstrap(document, ["app"]);
-});
-})();
-
-(function(){
-"use strict";
-
 angular.module("breadcrumbs", []).component("breadcrumbs", {
   controller: BreadcrumbsCtrl,
   controllerAs: "vm",
@@ -74,6 +40,40 @@ function BreadcrumbsCtrl() {
     });
   }
 }
+})();
+
+(function(){
+"use strict";
+
+angular.module("app", ["file-upload", "files", "settings"]).component("app", {
+  controller: AppCtrl,
+  templateUrl: "app/app.tpl.html",
+  controllerAs: "vm"
+});
+
+function AppCtrl() {
+  var vm = this;
+
+  vm.showSettings = true;
+  vm.showUpload = true;
+  vm.showFiles = false;
+
+  vm.toggleDisplay = toggleDisplay;
+  vm.setShowSettings = setShowSettings;
+
+  function toggleDisplay(upload) {
+    vm.showUpload = upload;
+    vm.showFiles = !upload;
+  }
+
+  function setShowSettings(showSettings) {
+    vm.showSettings = showSettings;
+  }
+}
+
+angular.element(document).ready(function () {
+  angular.bootstrap(document, ["app"]);
+});
 })();
 
 (function(){
@@ -179,21 +179,6 @@ function fileSize() {
     }
   };
 }
-})();
-
-(function(){
-'use strict';
-
-angular.module('file-upload.file-upload-status', []).component('fileUploadStatus', {
-  controller: FileUploadStatus,
-  controllerAs: 'vm',
-  bindings: {
-    fileStatus: '<'
-  },
-  templateUrl: 'file-upload/file-upload-status/file-upload-status.template.html'
-});
-
-function FileUploadStatus() {}
 })();
 
 (function(){
@@ -428,34 +413,6 @@ function FilterSizeCtl() {
 (function(){
 "use strict";
 
-angular.module("page-size", []).component("pageSize", {
-  controller: PageSizeCtrl,
-  controllerAs: "vm",
-  bindings: {
-    setPageSize: "&"
-  },
-  templateUrl: "page-size/page-size.tpl.html"
-});
-
-function PageSizeCtrl() {
-  var vm = this;
-
-  vm.$onInit = updatePageSize;
-  vm.pageOptions = [5, 10, 20, 50];
-  vm.pageSize = vm.pageOptions[0];
-  vm.updatePageSize = updatePageSize;
-
-  function updatePageSize() {
-    vm.setPageSize({
-      pageSize: vm.pageSize
-    });
-  }
-}
-})();
-
-(function(){
-"use strict";
-
 angular.module("pagination", []).component("pagination", {
   controller: PaginationCtrl,
   controllerAs: "vm",
@@ -510,6 +467,34 @@ function PaginationCtrl() {
         pageNumber: vm.pageNumber
       });
     }
+  }
+}
+})();
+
+(function(){
+"use strict";
+
+angular.module("page-size", []).component("pageSize", {
+  controller: PageSizeCtrl,
+  controllerAs: "vm",
+  bindings: {
+    setPageSize: "&"
+  },
+  templateUrl: "page-size/page-size.tpl.html"
+});
+
+function PageSizeCtrl() {
+  var vm = this;
+
+  vm.$onInit = updatePageSize;
+  vm.pageOptions = [5, 10, 20, 50];
+  vm.pageSize = vm.pageOptions[0];
+  vm.updatePageSize = updatePageSize;
+
+  function updatePageSize() {
+    vm.setPageSize({
+      pageSize: vm.pageSize
+    });
   }
 }
 })();
@@ -572,4 +557,19 @@ function SettingsCtrl(s3) {
     });
   }
 }
+})();
+
+(function(){
+'use strict';
+
+angular.module('file-upload.file-upload-status', []).component('fileUploadStatus', {
+  controller: FileUploadStatus,
+  controllerAs: 'vm',
+  bindings: {
+    fileStatus: '<'
+  },
+  templateUrl: 'file-upload/file-upload-status/file-upload-status.template.html'
+});
+
+function FileUploadStatus() {}
 })();
