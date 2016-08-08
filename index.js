@@ -15,7 +15,7 @@ mkdir('./build');
 ''.to('./build/external.js');
 ''.to('./build/external.css');
 
-watch('./src/**/*[^spec].js')
+watch('./src/**/*.js', {ignored:/.*\.spec\.js$/})
   .on('add', (path) => {
     console.log('file added to watch ' + path);
     let code = cat(path);

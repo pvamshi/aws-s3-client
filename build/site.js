@@ -2,49 +2,6 @@
 (function(){
 "use strict";
 
-angular.module("breadcrumbs", []).component("breadcrumbs", {
-  controller: BreadcrumbsCtrl,
-  controllerAs: "vm",
-  bindings: {
-    root: "<",
-    setFolder: "&"
-  },
-  templateUrl: "breadcrumbs/breadcrumbs.tpl.html"
-});
-
-function BreadcrumbsCtrl() {
-  var vm = this;
-
-  vm.$onInit = init;
-  vm.$onChanges = init;
-  vm.openFolder = openFolder;
-
-  function init() {
-    if (!vm.root) {
-      return;
-    }
-    var folders = vm.root.split("/");
-    var breadCrumbs = folders.reduce(aggregatepath, []);
-    vm.breadCrumbs = _.zip(folders, breadCrumbs);
-
-    function aggregatepath(finalArray, folder) {
-      var lastElem = finalArray[finalArray.length - 1];
-      finalArray.push(finalArray.length === 0 ? folder : lastElem + "/" + folder);
-      return finalArray;
-    }
-  }
-
-  function openFolder(folder) {
-    vm.setFolder({
-      folder: folder
-    });
-  }
-}
-})();
-
-(function(){
-"use strict";
-
 angular.module("app", ["file-upload", "files", "settings"]).component("app", {
   controller: AppCtrl,
   templateUrl: "app/app.tpl.html",
@@ -121,63 +78,43 @@ function CreateFolderCtrl(s3) {
 (function(){
 "use strict";
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-angular.module("file-list", ["file-list.file-size"]).component("fileList", {
-  controller: FileListCtrl,
+angular.module("breadcrumbs", []).component("breadcrumbs", {
+  controller: BreadcrumbsCtrl,
   controllerAs: "vm",
   bindings: {
-    files: "<",
-    sort: "<",
-    setSortSettings: "&",
-    setRootFolder: "&"
+    root: "<",
+    setFolder: "&"
   },
-  templateUrl: "file-list/file-list.template.html"
+  templateUrl: "breadcrumbs/breadcrumbs.tpl.html"
 });
 
-function FileListCtrl() {
+function BreadcrumbsCtrl() {
   var vm = this;
 
-  vm.sortFileByNames = sortFile("name");
-  vm.sortFileBySize = sortFile("size");
-  vm.sortFileByDate = sortFile("lastModified");
-  vm.setRoot = setRoot;
-  vm.showFolderInput = true;
-  //===============================
+  vm.$onInit = init;
+  vm.$onChanges = init;
+  vm.openFolder = openFolder;
 
-  function sortFile(param) {
-    return function () {
-      return vm.setSortSettings({
-        sortSettings: _defineProperty({}, param, vm.sort[param] === "desc" ? "asc" : "desc")
-      });
-    };
+  function init() {
+    if (!vm.root) {
+      return;
+    }
+    var folders = vm.root.split("/");
+    var breadCrumbs = folders.reduce(aggregatepath, []);
+    vm.breadCrumbs = _.zip(folders, breadCrumbs);
+
+    function aggregatepath(finalArray, folder) {
+      var lastElem = finalArray[finalArray.length - 1];
+      finalArray.push(finalArray.length === 0 ? folder : lastElem + "/" + folder);
+      return finalArray;
+    }
   }
 
-  function setRoot(file) {
-    vm.setRootFolder({
-      root: file.folderPath + '/' + file.name
+  function openFolder(folder) {
+    vm.setFolder({
+      folder: folder
     });
   }
-}
-})();
-
-(function(){
-'use strict';
-
-angular.module('file-list.file-size', []).filter('filesize', fileSize);
-
-function fileSize() {
-  return function (sizeInBytes) {
-    if (sizeInBytes / 1000000000 > 1) {
-      return _.round(sizeInBytes / 1000000000) + ' GB';
-    } else if (sizeInBytes / 1000000 > 1) {
-      return _.round(sizeInBytes / 1000000) + ' MB';
-    } else if (sizeInBytes / 1000 > 1) {
-      return _.round(sizeInBytes / 1000) + ' KB';
-    } else {
-      return sizeInBytes + ' B';
-    }
-  };
 }
 })();
 
@@ -289,6 +226,105 @@ function FileUploadCtrl(fileUploadService) {
 (function(){
 "use strict";
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+angular.module("file-list", ["file-list.file-size"]).component("fileList", {
+  controller: FileListCtrl,
+  controllerAs: "vm",
+  bindings: {
+    files: "<",
+    sort: "<",
+    setSortSettings: "&",
+    setRootFolder: "&"
+  },
+  templateUrl: "file-list/file-list.template.html"
+});
+
+function FileListCtrl() {
+  var vm = this;
+
+  vm.sortFileByNames = sortFile("name");
+  vm.sortFileBySize = sortFile("size");
+  vm.sortFileByDate = sortFile("lastModified");
+  vm.setRoot = setRoot;
+  vm.showFolderInput = true;
+  //===============================
+
+  function sortFile(param) {
+    return function () {
+      return vm.setSortSettings({
+        sortSettings: _defineProperty({}, param, vm.sort[param] === "desc" ? "asc" : "desc")
+      });
+    };
+  }
+
+  function setRoot(file) {
+    vm.setRootFolder({
+      root: file.folderPath + '/' + file.name
+    });
+  }
+}
+})();
+
+(function(){
+'use strict';
+
+angular.module('file-list.file-size', []).filter('filesize', fileSize);
+
+function fileSize() {
+  return function (sizeInBytes) {
+    if (sizeInBytes / 1000000000 > 1) {
+      return _.round(sizeInBytes / 1000000000) + ' GB';
+    } else if (sizeInBytes / 1000000 > 1) {
+      return _.round(sizeInBytes / 1000000) + ' MB';
+    } else if (sizeInBytes / 1000 > 1) {
+      return _.round(sizeInBytes / 1000) + ' KB';
+    } else {
+      return sizeInBytes + ' B';
+    }
+  };
+}
+})();
+
+(function(){
+"use strict";
+
+angular.module("filter-size", []).component("filterSize", {
+  controller: FilterSizeCtl,
+  controllerAs: "vm",
+  bindings: {
+    filterSettings: "<",
+    updateFiles: "&"
+  },
+  templateUrl: "filter-size/filter-size.tpl.html"
+});
+
+function FilterSizeCtl() {
+  var vm = this;
+  vm.filterFiles = filterFiles;
+
+  vm.options = [{
+    text: 'B',
+    value: 1
+  }, {
+    text: 'KB',
+    value: 1000
+  }, {
+    text: 'MB',
+    value: 1000000
+  }];
+
+  function filterFiles() {
+    vm.updateFiles({
+      filterSettings: vm.filterSettings
+    });
+  }
+}
+})();
+
+(function(){
+"use strict";
+
 angular.module("files", ["file-upload", "file-list", "page-size", "breadcrumbs", "pagination", "create-folder", "filter-size", "s3"]).component("files", {
   controller: AppCtrl,
   templateUrl: "files/files.tpl.html",
@@ -377,34 +413,26 @@ function AppCtrl(s3) {
 (function(){
 "use strict";
 
-angular.module("filter-size", []).component("filterSize", {
-  controller: FilterSizeCtl,
+angular.module("page-size", []).component("pageSize", {
+  controller: PageSizeCtrl,
   controllerAs: "vm",
   bindings: {
-    filterSettings: "<",
-    updateFiles: "&"
+    setPageSize: "&"
   },
-  templateUrl: "filter-size/filter-size.tpl.html"
+  templateUrl: "page-size/page-size.tpl.html"
 });
 
-function FilterSizeCtl() {
+function PageSizeCtrl() {
   var vm = this;
-  vm.filterFiles = filterFiles;
 
-  vm.options = [{
-    text: 'B',
-    value: 1
-  }, {
-    text: 'KB',
-    value: 1000
-  }, {
-    text: 'MB',
-    value: 1000000
-  }];
+  vm.$onInit = updatePageSize;
+  vm.pageOptions = [5, 10, 20, 50];
+  vm.pageSize = vm.pageOptions[0];
+  vm.updatePageSize = updatePageSize;
 
-  function filterFiles() {
-    vm.updateFiles({
-      filterSettings: vm.filterSettings
+  function updatePageSize() {
+    vm.setPageSize({
+      pageSize: vm.pageSize
     });
   }
 }
@@ -474,26 +502,206 @@ function PaginationCtrl() {
 (function(){
 "use strict";
 
-angular.module("page-size", []).component("pageSize", {
-  controller: PageSizeCtrl,
-  controllerAs: "vm",
-  bindings: {
-    setPageSize: "&"
-  },
-  templateUrl: "page-size/page-size.tpl.html"
-});
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function PageSizeCtrl() {
-  var vm = this;
+angular.module("s3", []).service("s3Service", FileUploadService);
 
-  vm.$onInit = updatePageSize;
-  vm.pageOptions = [5, 10, 20, 50];
-  vm.pageSize = vm.pageOptions[0];
-  vm.updatePageSize = updatePageSize;
+FileUploadService.$inject = ["$q"];
 
-  function updatePageSize() {
-    vm.setPageSize({
-      pageSize: vm.pageSize
+function FileUploadService($q) {
+  this.uploadFile = uploadFile;
+  this.getTotalFilesCount = getTotalFilesCount;
+  this.getFilesForSettings = getFilesForSettings;
+  this.createFolder = createFolder;
+  this.abortUpload = abortUpload;
+  this.getSettings = getSettings;
+  this.setSettings = setSettings;
+  this.testSettings = testSettings;
+
+  var storedSettings = void 0;
+
+  //===========================================================//
+
+  var bucket = void 0;
+
+  function getFilesForSettings(folder, settings) {
+    var files = getFilesFromStorage(folder);
+    files = filterFiles(files, settings.filter);
+    files = sort(files, settings.sort);
+    return $q.when(files.splice(settings.pageSize * (settings.pageNumber - 1), settings.pageSize));
+  }
+
+  function sort(files, sortSettings) {
+    if (!sortSettings) {
+      return files;
+    }
+    return _.orderBy(files, _.keys(sortSettings), _.keys(sortSettings).map(function (k) {
+      return sortSettings[k];
+    }));
+  }
+
+  function getTotalFilesCount(folder) {
+    // const files =!forceRefresh &&  getFilesFromStorage(folder);
+    // if (files) {
+    //   return $q.when(files.length);
+    // }
+    return fetchFiles().then(function (response) {
+      return response && response.files && response.files.length;
+    });
+  }
+
+  function getFilesFromStorage(folder) {
+    var storageFileJsonStr = sessionStorage.getItem(folder || "root");
+    try {
+      return JSON.parse(storageFileJsonStr);
+    } catch (e) {
+      console.error("error while parsing storage json");
+    }
+    return;
+  }
+
+  function filterFiles(files, filterSettings) {
+    if (filterSettings && filterSettings.name && files) {
+      (function () {
+        var regex = new RegExp(filterSettings.name.replace(/\./g, "\\.").replace(/\*/g, ".*"));
+        files = files.filter(function (file) {
+          return regex.test(file.name);
+        });
+      })();
+    }
+    if (filterSettings && files && filterSettings.size) {
+      if (filterSettings.size.min && filterSettings.size.min > 0) {
+        files = files.filter(function (file) {
+          return file.size > filterSettings.size.min * filterSettings.size.minTimes;
+        });
+      }
+      if (filterSettings.size.max && filterSettings.size.max > 0) {
+        files = files.filter(function (file) {
+          return file.size < filterSettings.size.max * filterSettings.size.maxTimes;
+        });
+      }
+    }
+    return files;
+  }
+
+  function fetchFiles() {
+
+    var deferred = $q.defer();
+    bucket.listObjects(function (err, data) {
+      if (err) {
+        deferred.reject(err);
+      } else {
+        if (data && data.Contents) {
+          saveFiles(data.Contents);
+          deferred.resolve({
+            files: JSON.parse(sessionStorage.getItem("root")),
+            meta: {}
+          });
+        } else {
+          //TODO: Send proper error
+          deferred.reject("no content in data");
+        }
+      }
+    });
+    return deferred.promise;
+  }
+
+  function saveFiles(files) {
+    _.chain(files).map(function (file) {
+      return getFile(file);
+    }).reduce(mapFiles, {}).forOwn(function (fileArr, parent) {
+      return sessionStorage.setItem(parent, JSON.stringify(fileArr));
+    }).value();
+  }
+
+  function mapFiles(dataObj, file) {
+    dataObj[file.folderPath] = dataObj[file.folderPath] || [];
+    dataObj[file.folderPath].push(file);
+    return dataObj;
+  }
+
+  function getFile(file) {
+    var folder = false;
+    var keySplit = file.Key.split("/");
+    var fileName = keySplit.pop();
+    if (fileName == "") {
+      folder = true;
+      fileName = keySplit.pop();
+    }
+    var parent = "root" + (keySplit.length > 0 ? "/" + keySplit.join("/") : "");
+    return new File(folder, parent, fileName, file.LastModified, file.Size);
+  }
+
+  var File = function File(folder, folderPath, name, lastModified, size) {
+    _classCallCheck(this, File);
+
+    this.folder = folder;
+    this.folderPath = folderPath;
+    this.name = name;
+    this.lastModified = new Date(lastModified).getTime();
+    this.size = size;
+  };
+
+  var req = void 0;
+
+  function uploadFile(file) {
+    var deferred = $q.defer();
+    req = bucket.putObject(file).on("httpUploadProgress", function (evt) {
+      return deferred.notify(getPercent(evt));
+    }).send(function (err, data) {
+      return err ? deferred.reject(err) : deferred.resolve(data);
+    });
+    return deferred.promise;
+  }
+
+  function abortUpload() {
+    req.request.abort();
+  }
+
+  function createFolder(root, folder) {
+    var folderKey = "";
+    if (root && root !== "root") {
+      folderKey = root + "/" + folder + "/";
+    } else {
+      folderKey = "pvamshi/" + folder + "/";
+    }
+    bucket.createBucket({
+      Bucket: folderKey
+    }, function (err, data) {
+      console.log("bucket creation: " + err ? "FAIL" : "SUCCESS");
+    });
+  }
+
+  function getPercent(evt) {
+    return parseInt(evt.loaded * 100 / evt.total);
+  }
+
+  function getSettings() {
+    return storedSettings;
+  }
+
+  function setSettings(settings) {
+    storedSettings = settings;
+    AWS.config.update({
+      accessKeyId: settings.accessKeyId,
+      secretAccessKey: settings.secretAccessKey
+    });
+    bucket = new AWS.S3({
+      params: {
+        Bucket: settings.bucket
+      }
+    });
+  }
+
+  function testSettings(settings) {
+    AWS.config.update({
+      accessKeyId: settings.accessKeyId,
+      secretAccessKey: settings.secretAccessKey
+    });
+    var s3 = new AWS.S3({
+      params: {
+        Bucket: settings.bucket
+      }
     });
   }
 }
@@ -562,6 +770,66 @@ function SettingsCtrl(s3) {
 (function(){
 'use strict';
 
+angular.module('file-upload.file-upload-input', []).directive('fileUploadInput', FileUploadInput);
+
+function FileUploadInput() {
+  var directive = {
+    scope: {
+      setFileList: '&',
+      setInvalidFiles: '&'
+    },
+    link: function link(scope, elem) {
+      var fileInput = elem.find('input')[0];
+      fileInput.addEventListener('change', function () {
+        var files = fileInput.files;
+        // let validFilesList = [];
+        var filesList = [];
+        for (var i = 0; i < files.length; i++) {
+          var file = files[i];
+          var fileValidity = validateFile(file);
+          filesList.push({
+            validity: fileValidity,
+            file: file
+          });
+        }
+        scope.setFileList({
+          files: filesList
+        });
+        scope.$apply();
+      });
+
+      function validateFile(file) {
+        var fileValidity = {
+          valid: true,
+          reason: ''
+        };
+        // if (file.type !== 'text/csv' && file.type !== 'application/vnd.ms-excel') {
+        if (!(/.*\.csv$/.test(file.name) || /.*\.xls$/.test(file.name))) {
+          fileValidity.valid = false;
+          fileValidity.reason = "File type need to be either .csv or .xls";
+          return fileValidity;
+        }
+        if (file.size === 0) {
+          fileValidity.valid = false;
+          fileValidity.reason = "File size cannot be 0";
+          return fileValidity;
+        }
+        if (file.size > 10000000) {
+          fileValidity.valid = false;
+          fileValidity.reason = "File size cannot exceed 10MB";
+        }
+        return fileValidity;
+      }
+    },
+    templateUrl: 'file-upload/file-upload-input/file-upload-input.template.html'
+  };
+  return directive;
+}
+})();
+
+(function(){
+'use strict';
+
 angular.module('file-upload.file-upload-status', []).component('fileUploadStatus', {
   controller: FileUploadStatus,
   controllerAs: 'vm',
@@ -572,4 +840,34 @@ angular.module('file-upload.file-upload-status', []).component('fileUploadStatus
 });
 
 function FileUploadStatus() {}
+})();
+
+(function(){
+'use strict';
+
+angular.module('file-upload.file-upload-warnings', []).component('fileUploadWarnings', {
+  controller: FileUploadWarning,
+  controllerAs: 'vm',
+  bindings: {
+    files: '<',
+    validFileLength: '@'
+  },
+  templateUrl: 'file-upload/file-upload-warnings/file-upload-warnings.template.html'
+});
+
+function FileUploadWarning() {
+  var vm = this;
+
+  vm.$onInit = vm.$onChanges = init;
+
+  function init() {
+    vm.invalidFiles = vm.files.filter(function (file) {
+      return !file.validity.valid;
+    });
+    vm.showError = vm.invalidFiles.length === vm.files.length;
+    //TODO: bug: Closing window hides the error page even for next iteration
+
+    vm.showDialog = true;
+  }
+}
 })();
